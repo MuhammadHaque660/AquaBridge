@@ -1,5 +1,5 @@
-import { useEffect } from 'react';
-import { Link, Route, Routes, useLocation, useNavigate } from 'react-router';
+import { lazy, Suspense, useEffect } from 'react';
+import { Link, Navigate, Route, Routes, useLocation, useNavigate } from 'react-router';
 import { SignInPage } from './features/auth/SignInPage';
 import { GuidancePage } from './features/guidance/GuidancePage';
 import { RehomePage } from './features/guidance/RehomePage';
@@ -16,12 +16,19 @@ import { EditorPage } from './features/listings/EditorPage';
 import { IncomingPage } from './features/listings/IncomingPage';
 import { ListingPage } from './features/listings/ListingPage';
 import { MyListingsPage } from './features/listings/MyListingsPage';
-import { DemosPage, DesignPage, MapPage } from './reference/ReferencePages';
 import { TourPanel } from './reference/tour';
 import { ROUTES, routeName } from './routes';
 import { Layout } from './shared/Layout';
 import { RequireAuth } from './shared/RequireAuth';
 import { page } from './shared/styles';
+
+// The team reference (and the backlog data it reads) is loaded only when someone opens it, so it never slows the product.
+const team = () => import('./reference/ReferencePages');
+const TeamHomePage = lazy(() => team().then((m) => ({ default: m.TeamHomePage })));
+const DemosPage = lazy(() => team().then((m) => ({ default: m.DemosPage })));
+const MapPage = lazy(() => team().then((m) => ({ default: m.MapPage })));
+const ScreenPage = lazy(() => team().then((m) => ({ default: m.ScreenPage })));
+const DesignPage = lazy(() => team().then((m) => ({ default: m.DesignPage })));
 
 const guard = (name, el) => <RequireAuth name={name}>{el}</RequireAuth>;
 
@@ -57,33 +64,41 @@ export function App() {
 
   return (
     <Layout>
-      <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/browse" element={<BrowsePage />} />
-        <Route path="/listings/new" element={guard('editor', <EditorPage />)} />
-        <Route path="/listings/:id/edit" element={guard('editor', <EditorPage />)} />
-        <Route path="/listings/:id" element={<ListingPage />} />
-        <Route path="/rehome" element={<RehomePage />} />
-        <Route path="/rehome/review" element={<ReviewPage />} />
-        <Route path="/rehome/guidance" element={<GuidancePage />} />
-        <Route path="/signin" element={<SignInPage />} />
-        <Route path="/account/listings" element={guard('mylistings', <MyListingsPage />)} />
-        <Route path="/account/incoming" element={guard('incoming', <IncomingPage />)} />
-        <Route path="/account/habitat" element={guard('habitat', <HabitatPage />)} />
-        <Route path="/account/habitat/:edit" element={guard('habitat', <HabitatPage />)} />
-        <Route path="/check/:id" element={guard('compat', <CompatPage />)} />
-        <Route path="/request/:id/:hab" element={guard('request', <RequestPage />)} />
-        <Route path="/account/requests" element={guard('myrequests', <MyRequestsPage />)} />
-        <Route path="/account/requests/sent/:id" element={guard('sent', <RequestSentPage />)} />
-        <Route path="/how-it-works" element={<HowItWorksPage />} />
-        <Route path="/accessibility" element={<AccessibilityPage />} />
-        <Route path="/privacy" element={<PrivacyPage />} />
-        <Route path="/contact" element={<ContactPage />} />
-        <Route path="/demos" element={<DemosPage />} />
-        <Route path="/map" element={<MapPage />} />
-        <Route path="/design" element={<DesignPage />} />
-        <Route path="*" element={<NotFound />} />
-      </Routes>
+      <Suspense fallback={<div className={page}>Loading…</div>}>
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/browse" element={<BrowsePage />} />
+          <Route path="/listings/new" element={guard('editor', <EditorPage />)} />
+          <Route path="/listings/:id/edit" element={guard('editor', <EditorPage />)} />
+          <Route path="/listings/:id" element={<ListingPage />} />
+          <Route path="/rehome" element={<RehomePage />} />
+          <Route path="/rehome/review" element={<ReviewPage />} />
+          <Route path="/rehome/guidance" element={<GuidancePage />} />
+          <Route path="/signin" element={<SignInPage />} />
+          <Route path="/account/listings" element={guard('mylistings', <MyListingsPage />)} />
+          <Route path="/account/incoming" element={guard('incoming', <IncomingPage />)} />
+          <Route path="/account/habitat" element={guard('habitat', <HabitatPage />)} />
+          <Route path="/account/habitat/:edit" element={guard('habitat', <HabitatPage />)} />
+          <Route path="/check/:id" element={guard('compat', <CompatPage />)} />
+          <Route path="/request/:id/:hab" element={guard('request', <RequestPage />)} />
+          <Route path="/account/requests" element={guard('myrequests', <MyRequestsPage />)} />
+          <Route path="/account/requests/sent/:id" element={guard('sent', <RequestSentPage />)} />
+          <Route path="/how-it-works" element={<HowItWorksPage />} />
+          <Route path="/accessibility" element={<AccessibilityPage />} />
+          <Route path="/privacy" element={<PrivacyPage />} />
+          <Route path="/contact" element={<ContactPage />} />
+          <Route path="/team" element={<TeamHomePage />} />
+          <Route path="/team/demos" element={<DemosPage />} />
+          <Route path="/team/screens" element={<MapPage />} />
+          <Route path="/team/screens/:name" element={<ScreenPage />} />
+          <Route path="/team/design" element={<DesignPage />} />
+          {/* Older addresses for the team pages */}
+          <Route path="/demos" element={<Navigate to="/team/demos" replace />} />
+          <Route path="/map" element={<Navigate to="/team/screens" replace />} />
+          <Route path="/design" element={<Navigate to="/team/design" replace />} />
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </Suspense>
       <TourPanel />
     </Layout>
   );

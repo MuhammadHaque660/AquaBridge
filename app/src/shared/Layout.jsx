@@ -5,6 +5,7 @@ import { USERS } from '../services/contracts';
 import { listForOwner } from '../services/requestService';
 import { seed } from '../services/seed';
 import { useStore } from '../services/store';
+import { GITHUB, JIRA_BOARD } from '../reference/links';
 import { useTour } from '../reference/tour';
 import { Chevron, Logo } from './components/Art';
 import { Toast } from './components/Feedback';
@@ -199,77 +200,50 @@ function Header() {
 }
 
 /**
- * Prototype banner (GOV.UK "phase banner" pattern). Says plainly that this is a prototype with sample data, and holds the
- * team notes toggle. The notes (screen owner, Sprint 1 tasks and stories) are off by default.
+ * Screen info bar (team notes): which screen this is, who builds it, and its Sprint 1 tickets and stories, with a link to
+ * the screen's page in the team reference. Shown by default; hide it here and bring it back from the footer.
  */
-function PrototypeBanner() {
+function ScreenInfo() {
   const { state, update } = useStore();
-  const { tour } = useTour();
-  const r = ROUTES[routeName(useLocation().pathname)];
-  const toggle = () =>
+  const name = routeName(useLocation().pathname);
+  const r = ROUTES[name];
+  if (!state.notes || r.team) return null;
+  const hide = () =>
     update((s) => {
-      s.notes = !s.notes;
+      s.notes = false;
     });
   return (
-    <div className="border-line bg-surface border-b">
-      <div className={cx(wrap, 'flex flex-wrap items-center gap-x-3 gap-y-1 py-2 text-sm')}>
-        <strong className="rounded-ab-sm bg-ink px-2 py-0.5 text-xs font-bold tracking-wide text-white">
-          PROTOTYPE
-        </strong>
-        <span className="text-ink-2">
-          Sample data only
-          <span className="max-sm:hidden">
-            . Guidance and compatibility results are examples, not legal or veterinary advice
-          </span>
-          .
-        </span>
-        <button
-          type="button"
-          onClick={toggle}
-          aria-expanded={state.notes}
-          className="text-primary ml-auto underline underline-offset-3 hover:decoration-2"
-        >
-          {state.notes ? 'Hide team notes' : 'Team notes'}
-        </button>
-      </div>
-      {state.notes && (
-        <div className="border-line bg-mist border-t" aria-label="Team notes">
-          <dl
-            className={cx(
-              wrap,
-              '[&_dt]:text-ink-2 m-0 flex flex-wrap gap-x-8 gap-y-1 py-2.5 text-sm [&_dd]:m-0 [&>div]:flex [&>div]:gap-1.5',
-            )}
-          >
-            <div>
-              <dt>Screen</dt>
-              <dd className="font-semibold">{r.title}</dd>
-            </div>
-            <div>
-              <dt>Built by</dt>
-              <dd className="text-primary font-semibold">{r.owner}</dd>
-            </div>
-            <div>
-              <dt>Tasks</dt>
-              <dd>{r.tasks}</dd>
-            </div>
-            <div>
-              <dt>Stories</dt>
-              <dd>{r.stories}</dd>
-            </div>
-            <div>
-              <dt>Login</dt>
-              <dd>{r.auth ? 'Required' : 'Not required'}</dd>
-            </div>
-            {!tour && (
-              <div className="ml-auto">
-                <dd>
-                  <Link to="/demos">Watch the demo flows</Link>
-                </dd>
-              </div>
-            )}
-          </dl>
+    <div className="border-line bg-mist border-b" aria-label="Screen information for the team">
+      <div className={cx(wrap, 'flex flex-wrap items-center gap-x-6 gap-y-1 py-2 text-sm')}>
+        <dl className="[&_dt]:text-ink-2 m-0 flex flex-wrap gap-x-6 gap-y-1 [&_dd]:m-0 [&>div]:flex [&>div]:gap-1.5">
+          <div>
+            <dt>Screen</dt>
+            <dd className="font-semibold">{r.title}</dd>
+          </div>
+          <div>
+            <dt>Built by</dt>
+            <dd className="text-primary-hover font-semibold">{r.owner}</dd>
+          </div>
+          <div>
+            <dt>Tickets</dt>
+            <dd>{r.tasks}</dd>
+          </div>
+          <div className="max-md:hidden!">
+            <dt>Stories</dt>
+            <dd>{r.stories}</dd>
+          </div>
+          <div className="max-md:hidden!">
+            <dt>Sign-in</dt>
+            <dd>{r.auth ? 'Required' : 'Not required'}</dd>
+          </div>
+        </dl>
+        <div className="ml-auto flex items-center gap-4">
+          <Link to={to('screen', { name })}>Screen details</Link>
+          <button type="button" onClick={hide} className="text-primary underline underline-offset-3 hover:decoration-2">
+            Hide<span className="sr-only"> screen information</span>
+          </button>
         </div>
-      )}
+      </div>
     </div>
   );
 }
@@ -277,7 +251,7 @@ function PrototypeBanner() {
 const FOOT_LINK = 'text-left text-ink underline underline-offset-3 hover:text-ink hover:decoration-2';
 
 function Footer() {
-  const { replace, toast } = useStore();
+  const { state, update, replace, toast } = useStore();
   const { exit } = useTour();
   const navigate = useNavigate();
   const reset = () => {
@@ -286,22 +260,41 @@ function Footer() {
     navigate('/');
     toast('Sample data has been reset');
   };
+  const toggleNotes = () =>
+    update((s) => {
+      s.notes = !s.notes;
+    });
+  const item = ([text, target]) => {
+    if (typeof target === 'function')
+      return (
+        <button type="button" className={FOOT_LINK} onClick={target}>
+          {text}
+        </button>
+      );
+    if (target.startsWith('http'))
+      return (
+        <a href={target} className={FOOT_LINK} target="_blank" rel="noreferrer">
+          {text}
+        </a>
+      );
+    if (target.startsWith('/backlog'))
+      return (
+        <a href={target} className={FOOT_LINK}>
+          {text}
+        </a>
+      );
+    return (
+      <Link to={target} className={FOOT_LINK}>
+        {text}
+      </Link>
+    );
+  };
   const group = (title, links) => (
     <nav aria-label={title} className="grid content-start gap-2">
       <h2 className="text-md">{title}</h2>
       <ul className="m-0 grid list-none gap-2 p-0">
-        {links.map(([text, target]) => (
-          <li key={text}>
-            {typeof target === 'function' ? (
-              <button type="button" className={FOOT_LINK} onClick={target}>
-                {text}
-              </button>
-            ) : (
-              <Link to={target} className={FOOT_LINK}>
-                {text}
-              </Link>
-            )}
-          </li>
+        {links.map((l) => (
+          <li key={l[0]}>{item(l)}</li>
         ))}
       </ul>
     </nav>
@@ -311,7 +304,7 @@ function Footer() {
       <div
         className={cx(
           wrap,
-          'grid grid-cols-[minmax(0,1.4fr)_repeat(3,minmax(0,1fr))] gap-10 py-12 max-lg:grid-cols-2 max-sm:grid-cols-1',
+          'grid grid-cols-[minmax(0,1.3fr)_repeat(3,minmax(0,1fr))] gap-10 py-12 max-lg:grid-cols-2 max-sm:grid-cols-1',
         )}
       >
         <div className="grid content-start gap-3">
@@ -329,27 +322,37 @@ function Footer() {
           ['Rehome an animal or plant', '/rehome'],
           ['How it works', '/how-it-works'],
           ['Never release them', '/how-it-works#never-release'],
-        ])}
-        {group('About', [
           ['Accessibility', '/accessibility'],
           ['Privacy', '/privacy'],
           ['Contact', '/contact'],
         ])}
-        {group('Team tools', [
-          ['Demo flows', '/demos'],
-          ['Screen map', '/map'],
-          ['Design system', '/design'],
+        {group('For the team', [
+          ['Team reference', '/team'],
+          ['Demo flows', '/team/demos'],
+          ['Screen map', '/team/screens'],
+          ['Design system', '/team/design'],
+          [state.notes ? 'Hide screen info' : 'Show screen info', toggleNotes],
           ['Reset sample data', reset],
+        ])}
+        {group('Project links', [
+          ['Sprint 1 backlog', '/backlog/'],
+          ['Jira board', JIRA_BOARD],
+          ['Code on GitHub', GITHUB],
         ])}
       </div>
       <div className="border-line border-t">
-        <p className={cx(wrap, 'text-ink-2 py-4')}>CS2701 Group B14 · Sprint 1 prototype · Sample data only</p>
+        <div className={cx(wrap, 'text-ink-2 flex flex-wrap justify-between gap-x-6 gap-y-1 py-4')}>
+          <p>
+            Prototype with sample data. Guidance and compatibility results are examples, not legal or veterinary advice.
+          </p>
+          <p>CS2701 Group B14 · Shawn D’Souza · Muhammad Farhan Ul Haque · Midhir Maru</p>
+        </div>
       </div>
     </footer>
   );
 }
 
-/** Page frame: header, prototype banner, the current screen, footer, toast. Focus moves to the new screen on navigation. */
+/** Page frame: header, screen info bar, the current screen, footer, toast. Focus moves to the new screen on navigation. */
 export function Layout({ children }) {
   const location = useLocation();
   const mainRef = useRef(null);
@@ -357,12 +360,18 @@ export function Layout({ children }) {
 
   useEffect(() => {
     if (location.hash) {
-      const el = document.getElementById(location.hash.slice(1));
-      if (el) {
-        el.scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
-        (el.querySelector('h2') || el).focus?.({ preventScroll: true });
-        return;
-      }
+      // The target may be on a page that is still loading (the team reference loads on demand), so look a few times.
+      let tries = 0;
+      let timer;
+      const find = () => {
+        const el = document.getElementById(location.hash.slice(1));
+        if (el) {
+          el.scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+          (el.querySelector('h2, h3') || el).focus?.({ preventScroll: true });
+        } else if (++tries < 30) timer = setTimeout(find, 50);
+      };
+      find();
+      return () => clearTimeout(timer);
     }
     window.scrollTo({ top: 0 });
     if (!first.current) mainRef.current?.focus({ preventScroll: true });
@@ -378,7 +387,7 @@ export function Layout({ children }) {
         Skip to main content
       </a>
       <Header />
-      <PrototypeBanner />
+      <ScreenInfo />
       <main id="main" tabIndex={-1} ref={mainRef} key={location.key} className="flex-1 focus:outline-none">
         {children}
       </main>

@@ -9,7 +9,7 @@ export const freshIntake = () => ({ step: 1, answers: {}, outcome: null, id: nul
 export function seed() {
   return {
     user: null,
-    notes: false, // team notes in the prototype banner
+    notes: true, // screen info bar for the team (hide it from the bar or the footer)
     pending: null, // { to, name, label } — where to go back to after login
     returnTo: null, // listing ID to return to after editing a habitat from a compatibility check
     intake: freshIntake(),

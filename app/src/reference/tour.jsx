@@ -35,11 +35,11 @@ export function TourProvider({ children }) {
   const value = useMemo(() => {
     const exit = (toDemos = true) => {
       setTour(null);
-      if (toDemos) navigate('/demos');
+      if (toDemos) navigate('/team/demos');
     };
     return {
       tour,
-      start: (flow) => show(flow, 0),
+      start: (flow, step = 0) => show(flow, step),
       next: () => {
         if (tour.i < FLOWS[tour.flow].steps.length - 1) show(tour.flow, tour.i + 1);
         else {

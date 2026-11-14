@@ -130,22 +130,41 @@ export const ROUTES = {
     stories: 'CORE-002',
   },
   contact: { path: '/contact', title: 'Contact', owner: 'Shared', tasks: 'Footer pages', stories: 'CORE-003' },
+  team: {
+    path: '/team',
+    title: 'Team reference',
+    owner: 'Product Owner reference',
+    tasks: 'Sprint 1 overview',
+    stories: 'All epics',
+    team: true,
+  },
+  screen: {
+    path: '/team/screens/:name',
+    title: 'Screen details',
+    owner: 'Product Owner reference',
+    tasks: 'Per-screen build spec',
+    stories: 'All epics',
+    team: true,
+  },
   demos: {
-    path: '/demos',
+    path: '/team/demos',
+    team: true,
     title: 'Demo flows',
     owner: 'Product Owner reference',
     tasks: 'End-to-end walkthroughs',
     stories: 'Core journey across all epics',
   },
   map: {
-    path: '/map',
+    path: '/team/screens',
+    team: true,
     title: 'Screen map',
     owner: 'Product Owner reference',
     tasks: 'Sprint 1 overview',
     stories: 'All epics',
   },
   design: {
-    path: '/design',
+    path: '/team/design',
+    team: true,
     title: 'Design system',
     owner: 'Shawn proposes · Midhir coordinates',
     tasks: 'Shared style system',
@@ -168,6 +187,8 @@ export function to(name, p = {}) {
       return `/check/${p.id}${p.hab ? `?hab=${p.hab}` : ''}`;
     case 'request':
       return `/request/${p.id}/${p.hab}`;
+    case 'screen':
+      return `/team/screens/${p.name}`;
     case 'sent':
       return `/account/requests/sent/${p.id}`;
     case 'signin':

@@ -170,10 +170,11 @@ app/src/
 |---|---|
 | **Sample user** | Any login signs in as **Jordan Lee (U-01)**, who owns some listings and has sent some requests, so both sides of the product can be seen. |
 | **Return after login** | Starting a guarded action while signed out (e.g. *Create my listing*) asks you to log in, then returns you to that action with your answers kept. |
-| **Build notes strip** | The grey bar under the header names each screen’s owner, Sprint 1 task IDs and backlog stories. Toggle it from the footer. |
+| **Screen info bar** | The bar under the header names each screen’s builder, Sprint 1 tickets and stories, with a **Screen details** link to its page in the team reference. Hide it from the bar; bring it back from the footer. |
+| **Team reference** | `/prototype/team`: overview, demo flows, a screen map with a page per screen (purpose, contents, tickets with acceptance criteria, stories, demo steps) and the design system with code to copy. Linked from the footer only. |
 | **Demo controls** | Dashed amber boxes let you play the *other* person (e.g. “Owner accepts”). They exist only in the prototype. |
 | **Reset sample data** | Footer link. Restores every listing, habitat and request. |
-| **Direct links** | Every screen has its own address, e.g. `/prototype/browse`, `/prototype/listings/L-1045`, `/prototype/demos`. Old `#demos`-style links still redirect. |
+| **Direct links** | Every screen has its own address, e.g. `/prototype/browse`, `/prototype/listings/L-1045`, `/prototype/team/demos`. Old `#demos`-style links still redirect. |
 
 ### Sample outcomes to try
 
@@ -190,7 +191,7 @@ app/src/
 
 ## Demo flows
 
-Open **Demo flows** from the prototype footer (or `/prototype/demos`). Each flow starts from fresh sample data. A guide panel says **who is acting**, **what they do**, **what the system does** and **who builds it**. Press **Next step** and the prototype performs the action and highlights it. **Back** works at every step.
+Open **Demo flows** from the prototype footer (or `/prototype/team/demos`). Each flow starts from fresh sample data. A guide panel says **who is acting**, **what they do**, **what the system does** and **who builds it**. Press **Next step** and the prototype performs the action and highlights it. **Back** works at every step.
 
 ### Flow 1 · Owner · Rehome six neon tetras (11 steps)
 
