@@ -25,7 +25,7 @@ h3. User stories
 h3. What to build
 * Short comparison of two or three options (for example React + Vite, Vue + Vite) against team experience and the Sprint 2 backend plan; record the decision
 * Repository with a starter app that runs with one command
-* Folders: src/shared (tokens, components, mocks, contracts), src/features/guidance, src/features/listings, src/features/habitat, src/features/requests, src/pages
+* Folders (as in the prototype’s app/src): shared (components, styles), services (contracts, species, sample data, request service, store), features/listings, features/guidance, features/habitat, features/auth, features/home
 * Linting and formatting config so everyone’s code looks the same
 * A test runner configured with one example test
 * Pull request template with a checklist: acceptance criteria met, tested at 375px, keyboard checked
@@ -40,7 +40,7 @@ h3. Depends on
 Unblocks everyone. Do first.
 
 h3. Where to look in the prototype
-Prototype → footer → Screen map shows every screen and its owner; use it to name routes and folders.
+Prototype → footer → Team reference → Screen map shows every screen and its owner; the Overview shows the folder each person owns.
 Prototype: https://aquabridge-zeta.vercel.app/prototype/
 
 h3. Acceptance criteria
@@ -58,7 +58,7 @@ h3. User stories
 * CORE-003: As an administrator, I want to follow a consistent interface across features and webpages, so that the application feels like one coherent product.
 
 h3. What to build
-* Tokens in app/src/index.css: colours (Ink #13293D, Secondary text #4B5F6B, Teal #0A6B60 and tint #E3F1EE, White, Mist #F5F7F7, Line #D4DCDC, Field border #8A9A9E, plus success / caution / error status colours), type scale, spacing, 4px and 8px radius
+* Tokens in app/src/index.css: colours (Ink #13293D, Secondary text #4B5F6B, Teal #0A6B60 and tint #E3F1EE, White, Mist #F5F7F7, Line #D4DCDC, Field border #7A8A8F, plus success / caution / error status colours), type scale, spacing, 4px and 8px radius
 * Font: Atkinson Hyperlegible Next for everything (no second display font, no monospace, no uppercase labels)
 * Button: primary, secondary, quiet, danger, small, large, disabled
 * Form controls: text input, number input, select, textarea, checkbox, large radio, field label, hint, error message and an error summary; optional fields marked “(optional)”
@@ -102,6 +102,7 @@ h3. What to build
 * Status enums: listing draft / active / reserved / rehomed / withdrawn; request pending / accepted / declined / withdrawn / completed; compatibility potential_match / needs_information / blocked; guidance eligible / needs_review / restricted
 * Fixtures: 10 species (incl. 2 restricted and ‘not sure’), 6+ listings across all statuses, 5 users, 3 habitats, requests in every status
 * A reset function that restores fixtures for demos
+* Saved sample data is versioned (DATA_VERSION in services/store.jsx): bump it whenever the fixtures or a data shape change, so browsers with old data reset cleanly
 
 h3. States to handle
 None.
@@ -113,12 +114,12 @@ h3. Depends on
 Needs SH-01. Unblocks F-05, F-06, S-02, S-08, M-01, M-03.
 
 h3. Where to look in the prototype
-Prototype → Screen map → ‘Shared contract values’ section lists every status and ID prefix.
+Prototype → footer → Team reference → Overview → ‘Shared status values’ lists every status, the wording people see and the ID prefixes.
 Prototype: https://aquabridge-zeta.vercel.app/prototype/
 
 h3. Acceptance criteria
 * All three agree the contracts in a short meeting; changes after that go through a pull request reviewed by the affected owner
-* Every module imports fixtures from src/shared/mocks
+* Every module reads fixtures from src/services (seed.js, species.js) and contracts from services/contracts.js
 * No screen hard-codes its own copy of another person’s data
 * Reset restores the original fixtures
 
@@ -130,12 +131,13 @@ h3. User stories
 * REG-005: As an owner, I want to reach the right account pages after signing in, so that I can manage my listings, habitat profile and requests.
 
 h3. What to build
-* Header: logo, Browse listings, Rehome, How it works; Sign in and Create an account when signed out
-* Signed-in account menu (dropdown): name, Rehoming group (My listings, Requests for my listings with pending count), Adopting group (My tanks and ponds, My adoption requests), Sign out
-* Active page highlighting, including parent sections (e.g. Browse stays active on a listing page)
-* Mobile menu below 900px: one Menu button opening all links stacked with the same groups
-* Homepage sections in order: hero with headline, two buttons and three reassurance points + aquarium illustration; How it works (two journey cards); Recently listed (3 cards); SDG 14 ‘never release’ band
-* Footer with project note and links
+* Header: logo, Browse listings, Rehome, Species guide, How it works; Sign in and Create an account when signed out
+* Signed-in account menu (dropdown): name, Rehoming group (My listings, Requests for my listings with a count of new requests), Adopting group (My tanks and ponds, My adoption requests), Sign out
+* Active page highlighting, including parent sections (e.g. Browse listings stays active on a listing page)
+* Menu button below 1080px opening all links stacked with the same groups; header links never wrap
+* Homepage in order: plain headline and one-paragraph summary, search box (species or town) that opens Browse listings, ‘Start rehoming’ link, aquarium illustration; Recently listed (4 cards); short ‘Rehoming yours’ and ‘Adopting’ sections; ‘Never release them’ warning
+* Footer: Using AquaBridge links (including Accessibility, Privacy, Contact), For the team links, Project links, and the sample-data note
+* Content pages: How it works, Accessibility, Privacy, Contact
 * Routes for every screen plus a not-found page
 
 h3. States to handle
@@ -155,10 +157,10 @@ Prototype → homepage and header. Demo Flow 1 step 1. The aquarium illustration
 Prototype: https://aquabridge-zeta.vercel.app/prototype/
 
 h3. Acceptance criteria
-* Homepage shows both primary actions above the fold on a 1280×720 screen and at 375px
+* Homepage shows the search box and the ‘Start rehoming’ link above the fold at 1280×720 and at 375px
 * Account menu opens and closes with mouse, Enter and Escape, and closes when clicking outside
 * Every route in the screen map loads; unknown routes show the not-found page
-* Mobile menu works with keyboard and screen reader
+* Header fits on one line from 1080px; below that the Menu button works with keyboard and screen reader
 
 _Plan ticket SH-04 · Week 1_","High","sprint-1","week-1","reading-week-target","1","Farhan"
 "104","Story","SH-05 Login and sign-up screens with mock authentication and return-to-action","Mock signed-in and signed-out states, the login and sign-up screens, and route guards. The university-provided component replaces the form later, so keep it behind one small auth module.
@@ -210,7 +212,7 @@ Team process task.
 
 h3. What to build
 * Invite Farhan and Midhir to KAN
-* Board columns: To do, In progress, In review, Done
+* Board columns: To Do, In Progress, In Review, Resolved
 * Labels: sprint-1, week-1/2/3, reading-week-target
 * Daily update template: done yesterday, doing today, blockers
 
@@ -224,7 +226,7 @@ h3. Depends on
 None.
 
 h3. Where to look in the prototype
-This backlog page is the source for the tickets.
+The backlog page is the source for the tickets.
 Prototype: https://aquabridge-zeta.vercel.app/prototype/
 
 h3. Acceptance criteria
@@ -233,7 +235,7 @@ h3. Acceptance criteria
 * First daily update posted by all three
 
 _Plan ticket SH-06 · Week 1_","Medium","sprint-1","week-1","","1","Shawn"
-"106","Task","SH-07 Run the three end-to-end demo flows and fix what breaks","Integration checkpoint using the prototype’s Demo flows as the script.
+"106","Task","SH-07 Run the five end-to-end demo flows and fix what breaks","Integration checkpoint using the prototype’s Demo flows as the script.
 
 h3. User stories
 * CORE-002: As a user, I want to use the application with a keyboard and on mobile, so that I can complete the main journey accessibly.
@@ -254,13 +256,15 @@ h3. Depends on
 All feature tickets.
 
 h3. Where to look in the prototype
-Prototype → footer → Demo flows (Flow 1 owner rehomes, Flow 2 adopter requests, Flow 3 decision and handover).
+Prototype → footer → Team reference → Demo flows: Flow 1 owner rehomes, Flow 2 adopter requests, Flow 3 decision and handover, Flow 4 first-time adopter, Flow 5 when it can’t be listed.
 Prototype: https://aquabridge-zeta.vercel.app/prototype/
 
 h3. Acceptance criteria
-* Flow 1 runs from homepage to a visible listing without resetting data
-* Flow 2 shows needs-information, blocked and potential-match results and ends with a pending request
+* Flow 1 runs from the homepage to a visible listing without resetting data
+* Flow 2 shows needs-information, not-compatible and looks-suitable results and ends on the request confirmation
 * Flow 3 ends with the request completed and the listing rehomed
+* Flow 4 starts with no saved tank, adds one from the empty state and sends a request
+* Flow 5 shows the restricted and needs-checking outcomes with next steps and the species guide
 * Every flow works by keyboard alone and at 375px
 
 _Plan ticket SH-07 · Week 3_","High","sprint-1","week-3","","1","All three"
@@ -274,6 +278,7 @@ h3. What to build
 * Checklist: keyboard order, visible focus, labels on every field, errors announced, contrast, 44px touch targets, no horizontal scroll at 375px, reduced-motion respected
 * A table of screens × checks in the repo wiki or README
 * Bug tickets for failures assigned to the screen owner
+* Automated axe-core checks in npm test (app/src/a11y.test.jsx) for every screen, signed in and out
 
 h3. States to handle
 None.
@@ -292,6 +297,7 @@ h3. Acceptance criteria
 * Checklist published in the repo
 * Every screen in the screen map checked once in Week 2
 * Failures logged as bugs with the screen owner assigned
+* npm test passes the automated accessibility checks for every screen
 
 _Plan ticket SH-08 · Week 2_","Medium","sprint-1","week-2","","1","Midhir"
 "108","Task","SH-09 Shared feedback patterns: toasts, confirmations, empty and error states","Small shared components so every feature reports success, errors and empty data the same way.
@@ -306,6 +312,9 @@ h3. What to build
 * Empty state block: message + one action
 * Error notice for failed actions with a plain explanation
 * Not-found page content
+* Error summary for forms: “There is a problem” box that takes focus and links to each field
+* Error page when a screen crashes (shared/ErrorBoundary.jsx), with a reset option
+* Confirmation panel with a reference (used after sending a request)
 
 h3. States to handle
 * Success
@@ -324,9 +333,10 @@ Prototype: toast after publishing (Flow 1 step 10), inline ‘Withdraw this list
 Prototype: https://aquabridge-zeta.vercel.app/prototype/
 
 h3. Acceptance criteria
-* Components exist in src/shared and are used by at least one screen per person
+* Components exist in the shared folder and are used by at least one screen per person
 * No screen uses alert() or confirm()
 * Toasts are announced by screen readers
+* A crash on one screen shows the error page, not a blank screen
 
 _Plan ticket SH-09 · Week 1_","High","sprint-1","week-1","reading-week-target","1","Midhir"
 "109","Story","F-01 Questionnaire shell with progress and Back/Next","Four-step form (Organism, Species, Condition, Location) that guests can use without an account.
@@ -335,14 +345,14 @@ h3. User stories
 * GUID-001: As an owner, I want to start a guided rehoming questionnaire, so that I can understand my options without immediately creating an advert.
 
 h3. What to build
-* Page heading ‘Tell us about it’ with a one-line explanation
-* Progress bar with 4 labelled segments; current step announced to screen readers
-* Back and Continue buttons; last step says ‘Review my answers’
+* One question per page: a ‘Step N of 4’ caption and a thin progress bar above a heading that is the question itself
+* Back link at the top (to the homepage on step 1); a Continue button, which says ‘Check your answers’ on the last step
+* Error summary at the top after a failed Continue, linking to each field
 * Draft store holding answers across steps and reloads in the same browser
-* Side panel with the species care widget (F-05) and a ‘Never release it’ notice
+* Care needs panel (F-05) beside the form once a species is chosen, and a ‘Never release them’ warning
 
 h3. States to handle
-* First step (no Back)
+* First step (back link goes to the homepage)
 * Middle steps
 * Last step
 * Validation error on Continue
@@ -360,7 +370,7 @@ Prototype: https://aquabridge-zeta.vercel.app/prototype/
 
 h3. Acceptance criteria
 * Back and Continue keep all entered values
-* Continue validates the current step and moves focus to the first error
+* Continue validates the current step and shows an error summary that takes focus
 * Draft survives a page reload
 * Works at 375px and by keyboard
 
@@ -407,10 +417,10 @@ h3. User stories
 * GUID-003: As an owner, I want to review and amend my answers, so that the assessment is based on information I intended to supply.
 
 h3. What to build
-* Four groups (Organism, Species, Condition, Location and timing) as label/value tables
-* ‘Change’ link per group that opens that step
+* One summary list row per answer (type, species, how many, condition, problem, reason, location, how soon, other details)
+* ‘Change’ link per answer that opens that question and, once every answer is complete, comes straight back to Check your answers
 * ‘Not given’ shown for empty optional answers
-* Buttons: Back, See my guidance
+* Back link at the top; button: Get my guidance
 
 h3. States to handle
 * All answered
@@ -423,11 +433,11 @@ h3. Depends on
 Needs F-02.
 
 h3. Where to look in the prototype
-Prototype → Rehome → Review my answers. Demo Flow 1 step 6.
+Prototype → Rehome → Check your answers. Demo Flow 1 step 6.
 Prototype: https://aquabridge-zeta.vercel.app/prototype/
 
 h3. Acceptance criteria
-* Change returns to the right step with answers kept
+* Change opens the right question and returns to Check your answers with every other answer kept
 * Edited answers show in review, guidance and listing pre-fill
 
 _Plan ticket F-03 · Week 2_","High","sprint-1","week-2","","3","Farhan"
@@ -461,7 +471,7 @@ h3. Depends on
 Needs F-03, F-05.
 
 h3. Where to look in the prototype
-Prototype → Rehome → guidance (try Neon tetra, ‘I’m not sure’, and Red-eared slider). Demo Flow 1 step 7.
+Prototype → Rehome → guidance (try Neon tetra, ‘I’m not sure’, and Red-eared slider). Demo Flow 1 step 7; Flow 5 steps 2, 3 and 6.
 Prototype: https://aquabridge-zeta.vercel.app/prototype/
 
 h3. Acceptance criteria
@@ -479,10 +489,11 @@ h3. User stories
 * SPEC-003: As a user, I want to see when species advice is incomplete or unverified, so that I can recognise missing or unverified information before making a decision.
 
 h3. What to build
-* Species fixtures: id, common and scientific name, kind, group (tropical, coldwater, plant, pond), habitats, temperature range, pH range, minimum volume, minimum depth (ponds), light, care text, status (supported / restricted / unknown)
-* Care widget: name, scientific name, temperature, pH, volume, habitat, care text
-* Warning inside the widget for restricted or unidentified species
-* ‘Sample data, not verified by a specialist’ line
+* Species fixtures: id, common and scientific name, plural name, kind, group (tropical, coldwater, plant, pond), habitats, temperature range, pH range, minimum volume, minimum depth (ponds), light, care text, status (supported / restricted / unknown)
+* Shared CareList component (features/guidance/CareList.jsx): the care ranges as a summary list with units, used by the listing page, care needs panel, compatibility check and species guide
+* Care needs panel: name, scientific name, care ranges, care text and a ‘Read the full guide’ link to the species page
+* Notice inside the panel for restricted or unidentified species
+* ‘Sample data, not checked by a specialist’ line
 
 h3. States to handle
 * No species chosen
@@ -497,12 +508,12 @@ h3. Depends on
 Needs SH-03.
 
 h3. Where to look in the prototype
-Prototype → Rehome step 2 side panel; listing page ‘Care needs’ panel.
+Prototype → Rehome step 2 side panel; listing page ‘Care needs’ section; Species guide.
 Prototype: https://aquabridge-zeta.vercel.app/prototype/
 
 h3. Acceptance criteria
 * At least 7 supported species (animals and plants), 2 restricted, 1 unknown
-* Widget shows correct values for each
+* Care ranges show the same values and units everywhere because they come from CareList
 * Shawn and Midhir read species only through getSpecies/listSpecies
 
 _Plan ticket F-05 · Week 1_","High","sprint-1","week-1","reading-week-target","3","Farhan"
@@ -577,10 +588,10 @@ h3. User stories
 * SPEC-003: As a user, I want to see when species advice is incomplete or unverified, so that I can recognise missing or unverified information before making a decision.
 
 h3. What to build
-* Species list page with a search box and animal/plant filter
-* Species detail page: species illustration, care ranges, habitat, care text, verification note
-* Restricted species shown with a clear ‘cannot be listed’ notice and guidance link
-* Links from the listing page’s ‘Care needs’ panel to the species page
+* Species guide list (/species): search by common or scientific name, animal/plant filter with counts, one card per species with its illustration
+* Species page (/species/:id): illustration, care ranges with units (shared CareList), habitat, care text, verification note, live listings for that species
+* Restricted species: ‘Restricted: cannot be listed’ tag, warning and a link to what to do instead
+* ‘Species guide’ link in the header and footer, and ‘Read the full guide’ from every care needs panel
 
 h3. States to handle
 * Search with results
@@ -595,13 +606,14 @@ h3. Depends on
 Needs F-05.
 
 h3. Where to look in the prototype
-Reuse the prototype’s care needs panel and species illustrations; your group’s wireframe slide 23 ‘Species information’ shows the layout.
+Prototype → header → Species guide. Demo Flow 5 step 4 shows a restricted species.
 Prototype: https://aquabridge-zeta.vercel.app/prototype/
 
 h3. Acceptance criteria
 * Search finds species by common or scientific name
-* Each detail page shows all care fields with units
-* Restricted species are clearly marked
+* Each species page shows all care fields with units
+* Restricted species are clearly marked and link to what to do instead
+* Unknown species IDs show a ‘Species not found’ page
 
 _Plan ticket F-08 · Week 2_","Medium","sprint-1","week-2","","3","Farhan"
 "117","Story","S-01 Listing editor with pre-fill, validation and preview","Create and edit listings, pre-filled from Farhan’s intake when one is supplied.
@@ -612,12 +624,12 @@ h3. User stories
 * LIST-003: As an owner, I want to publish, edit or withdraw my listing, so that its information and availability remain accurate.
 
 h3. What to build
-* Two-column layout: form on the left, sticky live preview on the right (card as adopters see it + species care widget)
-* ‘Filled in from your rehoming answers’ notice showing the intake ID when pre-filled
+* Two-column layout: form on the left, sticky preview on the right showing the listing card as adopters will see it
+* ‘We have filled this in from your answers’ notice when pre-filled
 * Fields: title, species (locked when from intake), quantity, location, condition, availability, description, care notes
-* Photo placeholder area (‘Photos coming in a later sprint’) per the original LIST-001 task
-* Buttons: Save as draft, Publish listing (Save changes when already active)
-* Error summary above the buttons plus inline errors; focus moves to the first error
+* Photo placeholder area (‘Photos coming in a later sprint’) per the original LIST-001 task; not drawn in the prototype
+* Buttons: Publish listing (Save changes when already live) and Save as draft, which is hidden when editing a live listing
+* Error summary at the top of the form (takes focus, links to each field) plus inline errors
 
 h3. States to handle
 * New from intake
@@ -640,7 +652,7 @@ h3. Acceptance criteria
 * Title 10–80 characters and description 40+ characters with inline errors
 * Preview updates as the owner types
 * Draft saves with just a title; Publish requires all required fields
-* Publishing shows a ‘Published’ toast and opens My listings
+* Publishing opens My listings with the toast ‘Your listing is live. It now appears in Browse listings.’; saving a live listing says ‘Your changes have been saved’
 
 _Plan ticket S-01 · Week 2_","High","sprint-1","week-2","reading-week-target","4","Shawn"
 "118","Story","S-02 Public browse page with listing cards","Guests can browse active listings. Cards show only the essentials.
@@ -651,7 +663,7 @@ h3. User stories
 
 h3. What to build
 * Page heading and one-line explanation
-* Responsive card grid (auto-fill, min 260px)
+* Responsive card grid (auto-fill, min 250px)
 * Card: species illustration, title, ‘Species · N available’, ‘Town · Listed date’, at most one tag (‘Needs a home soon’ or ‘Your listing’)
 * Whole card is one link to the listing page
 * Result count
@@ -673,7 +685,7 @@ Prototype: https://aquabridge-zeta.vercel.app/prototype/
 
 h3. Acceptance criteria
 * Only active listings shown
-* Cards hide care ranges, quantity, condition and IDs
+* Cards hide care ranges, condition, the owner and IDs
 * Grid works from 375px to desktop with no horizontal scroll
 * Newly published listings appear; withdrawn, reserved and rehomed do not
 
@@ -686,11 +698,11 @@ h3. User stories
 * SPEC-003: As a user, I want to see when species advice is incomplete or unverified, so that I can recognise missing or unverified information before making a decision.
 
 h3. What to build
-* Back link to all listings, large species illustration, title, town and date, tags, description, summary lists for the facts and care needs
-* Facts grid: species, quantity, condition, location (town + district), availability, listed by (first name + initial)
-* Owner’s care notes; ‘Before you ask’ list (what to prepare, what to bring, pickup arranged after acceptance)
-* Sticky side panel: three-step explanation + Check compatibility; if the adopter already has an open request, show its status and a link to My adoption requests; if the viewer is the owner, show Manage in My listings
-* Care needs panel from F-05 with the ‘not verified’ note
+* Back link to all listings, large species illustration, title, town and listed date, tags
+* ‘About this listing’ summary list: species (with scientific name), how many, condition, location (town and district), needs a home, listed by (first name and initial)
+* ‘Notes from the owner’ when given; ‘Care needs’ section with the care text, the shared CareList and the ‘not checked by a specialist’ line
+* ‘Before you collect’ list for adopters (set up the tank or pond first, collection arranged after acceptance, what to bring)
+* Sticky action box: three-step explanation and Check compatibility; an open request shows its status and View my adoption requests; the owner sees Manage my listings; inactive listings show Not taking requests
 
 h3. States to handle
 * Guest
@@ -754,8 +766,7 @@ h3. User stories
 * CORE-001: As a user, I want to access the data and actions that belong to me, so that all data and information is protected.
 
 h3. What to build
-* Header with New listing button (starts the questionnaire)
-* Four counters: active, reserved, drafts, rehomed
+* Header with a ‘Rehome another’ button (starts the questionnaire); no stat tiles, the tab counts do that job
 * Status tabs with counts
 * Table: title with species × qty, status tag, open requests, listed date, actions as links (Edit, Publish, Requests (n), Withdraw, Move to drafts). No IDs shown
 * Table scrolls inside its own container on small screens
@@ -879,7 +890,7 @@ h3. Depends on
 Needs SH-03. Unblocks M-06, M-07, M-09, S-06.
 
 h3. Where to look in the prototype
-Prototype → Demo flows → ‘Behind the scenes’ boxes show each call.
+Team reference → Demo flows: the ‘What the system does’ section on each step names the call.
 Prototype: https://aquabridge-zeta.vercel.app/prototype/
 
 h3. Acceptance criteria
@@ -896,8 +907,9 @@ h3. User stories
 
 h3. What to build
 * Search box (species, scientific name, town)
-* Segmented filters: All / Animals / Plants and Any / Aquarium / Pond
-* Result count and Clear filters
+* Filters in a sidebar as radio lists with counts: Type (All / Animals / Plants) and Lives in (Aquarium or pond / Aquarium / Pond); a collapsible “Filter listings” panel on phones
+* Sort: newest first, needs a home soonest
+* Result count, no-results state and Clear filters
 
 h3. States to handle
 * Results
@@ -910,13 +922,14 @@ h3. Depends on
 Needs S-02.
 
 h3. Where to look in the prototype
-Prototype → Browse listings toolbar.
+Prototype → Browse listings (search, filter sidebar and sort).
 Prototype: https://aquabridge-zeta.vercel.app/prototype/
 
 h3. Acceptance criteria
 * Typing filters without losing focus
-* Filters combine
+* Filters and search combine, and the counts update
 * Clear filters restores all
+* Filters work on phones through the collapsible panel
 
 _Plan ticket S-09 · Week 3_","Low","sprint-1","week-3","","4","Shawn"
 "126","Story","S-10 Handover tracker and owner confirmation","Shared tracker component plus the owner’s confirmation. Midhir reuses the tracker in M-09.
@@ -927,8 +940,8 @@ h3. User stories
 * REQ-008: As an owner or adopter, I want to see request statuses clearly, so that I understand the application progress.
 
 h3. What to build
-* Tracker component: Request accepted → Owner confirmed → Adopter confirmed → Rehoming complete, with done / current / to-do styles; stacks vertically on mobile
-* ‘Confirm handover happened’ button for the owner with a note that both sides must confirm
+* Tracker component (shared/components/Tracker.jsx): a vertical list, Request accepted → Owner confirmed the handover → Adopter confirmed the handover → Rehoming complete, with done / next / not started styles and screen-reader text for each
+* ‘Confirm the handover happened’ button for the owner with a note that both sides must confirm
 * Waiting message after the owner confirms
 * Completed notice when both confirm
 
@@ -945,7 +958,7 @@ h3. Depends on
 Needs S-07, S-08.
 
 h3. Where to look in the prototype
-Prototype → Design system → Handover tracker; Demo Flow 3 steps 7–9.
+Team reference → Design system → Handover progress; Demo Flow 3 steps 7–9.
 Prototype: https://aquabridge-zeta.vercel.app/prototype/
 
 h3. Acceptance criteria
@@ -966,7 +979,7 @@ h3. What to build
 * Pond only: deepest point (cm)
 * Filter running (yes / no / not set), filter cycled (yes / no / not sure), lighting (low / medium / high)
 * What already lives there
-* Buttons: Cancel, Save habitat (‘and return to check’ when opened from a check)
+* Buttons: Save (‘Save and return to the check’ when opened from a check) and Cancel
 
 h3. States to handle
 * New
@@ -982,7 +995,7 @@ h3. Depends on
 Needs SH-02, SH-03.
 
 h3. Where to look in the prototype
-Prototype → Your account → My tanks and ponds → Add a habitat. Demo Flow 2 step 6.
+Prototype → Your account → My tanks and ponds → Add a tank or pond. Demo Flow 2 step 6; Flow 4 steps 3–6 (first tank from the empty state).
 Prototype: https://aquabridge-zeta.vercel.app/prototype/
 
 h3. Acceptance criteria
@@ -1000,7 +1013,7 @@ h3. User stories
 
 h3. What to build
 * Quiet panels: name, type tag, ‘N details missing’ or ‘Complete’ tag, summary list, Edit (no IDs)
-* Add a habitat button
+* ‘Add a tank or pond’ button in the page header and in the empty state
 * Saving from a check returns to that check with the habitat selected
 
 h3. States to handle
@@ -1032,10 +1045,10 @@ h3. User stories
 
 h3. What to build
 * Back link to the listing, heading, explanation
-* Habitat picker + Edit this habitat + Add another
-* Outcome banner (from M-04)
-* ‘What we checked’ list: icon, rule name, one-line reason, Met / Not met / Missing / Advice label
-* Range bars for temperature and pH (species range vs habitat values) with a legend
+* ‘Which tank or pond?’ select, with ‘Edit {name}’ and ‘Add another tank or pond’ links
+* Outcome box (from M-04): status tag, heading, one-line summary and the next action
+* ‘What we checked’ list: a Meets / Does not meet / Missing / Advice tag, the rule name and a one-line reason in plain words (no icons)
+* Range bars for temperature and pH (species range vs your values) with a one-line key under each bar
 * Side panel: listing card + care needs
 
 h3. States to handle
@@ -1050,7 +1063,7 @@ h3. Depends on
 Needs M-02, F-05, S-03.
 
 h3. Where to look in the prototype
-Prototype → open a listing → Check compatibility. Demo Flow 2 steps 4–7; Design system → Range bar.
+Prototype → open a listing → Check compatibility. Demo Flow 2 steps 4–7, Flow 4 steps 3–7; Design system → Range bar.
 Prototype: https://aquabridge-zeta.vercel.app/prototype/
 
 h3. Acceptance criteria
@@ -1069,7 +1082,7 @@ h3. What to build
 * Hard rules (fail → blocked): habitat type, temperature inside range, volume ≥ minimum, filter running (animals), pond depth (pond plants)
 * Missing input → needs_information
 * Advice only (never blocks): pH outside range, filter not cycled, lighting mismatch
-* Action per outcome: ‘Ask {owner} to adopt’ (match), ‘Add the missing details’ (needs information), no request button and the reason first (blocked)
+* Action per outcome: ‘Ask {owner} to adopt’ (match), ‘Add the missing details’ (needs information), ‘Browse other listings’ and no request button (blocked)
 
 h3. States to handle
 * potential_match
@@ -1104,7 +1117,7 @@ h3. What to build
 
 h3. States to handle
 * Complete
-* Missing values shown as —
+* Missing values shown as ‘Not given’
 
 h3. Data in and out
 HabitatSummary { type, volume, tempMin, tempMax, ph, filter, cycled, depth, inhabitants }.
@@ -1131,12 +1144,13 @@ h3. What to build
 * Introduction textarea (30+ characters, no contact details hint)
 * Acknowledgement checkbox
 * Side panel: ‘What the owner will see’ summary + listing card
-* Buttons: Back, Send request
+* ‘Back to the compatibility check’ link at the top; buttons: Send request and Cancel (returns to the check)
+* Confirmation page (/account/requests/sent/:id): ‘Request sent’ confirmation panel with the reference, ‘What happens next’, Go to my adoption requests and Browse listings
 
 h3. States to handle
 * Validation errors
 * Service error (duplicate, listing no longer active)
-* Success → My adoption requests with toast
+* Success → confirmation page
 
 h3. Data in and out
 Calls RequestService.submit.
@@ -1145,13 +1159,13 @@ h3. Depends on
 Needs M-04, M-05, S-08.
 
 h3. Where to look in the prototype
-Demo Flow 2 step 8.
+Demo Flow 2 steps 8–9; Flow 4 steps 8–9.
 Prototype: https://aquabridge-zeta.vercel.app/prototype/
 
 h3. Acceptance criteria
 * Can only be reached with a potential_match result
 * Service errors appear in the form without losing text
-* Success opens My adoption requests
+* Success opens the confirmation page with the reference and what happens next
 
 _Plan ticket M-06 · Week 2_","High","sprint-1","week-2","","6","Midhir"
 "133","Story","M-07 My adoption requests list with withdrawal","Adopter view of every request they have sent.
@@ -1180,7 +1194,7 @@ h3. Depends on
 Needs S-08.
 
 h3. Where to look in the prototype
-Prototype → Your account → My adoption requests. Demo Flow 2 steps 9–10.
+Prototype → Your account → My adoption requests. Demo Flow 2 steps 10–11.
 Prototype: https://aquabridge-zeta.vercel.app/prototype/
 
 h3. Acceptance criteria
@@ -1229,9 +1243,10 @@ h3. User stories
 
 h3. What to build
 * Tracker (from S-10) on accepted requests
-* ‘I’ve received them’ button with a note to confirm only after the handover
+* ‘I have received them’ button with a note to confirm only after the handover
 * Waiting message when the adopter has confirmed first
 * Completed notice
+* Prototype only: a control to play the owner’s confirmation, so the adopter side can reach Completed
 
 h3. States to handle
 * Accepted, nobody confirmed
