@@ -83,7 +83,7 @@ export function ListingPage() {
         <ol className={cx(reasonsOl, 'text-sm')}>
           <li>{myHabs ? `Choose one of your ${myHabs} saved tanks or ponds` : 'Tell us about your tank or pond'}.</li>
           <li>We compare it with the care needs for this species.</li>
-          <li>If it is suitable, introduce yourself to {USERS[l.owner].short}.</li>
+          <li>If it is suitable, introduce yourself to {USERS[l.owner].name.split(' ')[0]}.</li>
         </ol>
         <Button to={to('compat', { id: l.id })} data-tour="check-compat">
           Check compatibility

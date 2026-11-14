@@ -50,7 +50,7 @@ export function seed() {
         id: 'L-1044',
         owner: 'U-05',
         speciesId: 'SP-005',
-        title: 'Three Java fern on driftwood',
+        title: 'Three Java ferns on driftwood',
         qty: 3,
         location: 'Reading, RG1',
         condition: 'healthy',

@@ -43,6 +43,7 @@ export function RehomePage() {
     update((s) => {
       s.intake.answers[k] = v;
       if (k === 'kind') delete s.intake.answers.speciesId;
+      if (k === 'condition' && v === 'healthy') delete s.intake.answers.health;
     });
   const val = (k) => (e) => set(k, e.target.value);
   const goStep = (next) => {
@@ -58,8 +59,15 @@ export function RehomePage() {
     const errs = validateStep(n, a);
     setErrors(errs);
     if (Object.keys(errs).length) return;
-    if (n < 4) goStep(n + 1);
-    else navigate('/rehome/review');
+    // Arrived from a "Change" link on Check your answers: go straight back there, unless the change
+    // (for example animal → plant) means a later question now needs answering.
+    const complete = [1, 2, 3, 4].every((step) => !Object.keys(validateStep(step, a)).length);
+    if ((state.intake.fromReview && complete) || n === 4) {
+      update((s) => {
+        s.intake.fromReview = false;
+      });
+      navigate('/rehome/review');
+    } else goStep(n + 1);
   };
 
   const heading = <h1>{QUESTION[n]}</h1>;

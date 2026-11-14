@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router';
 import { freshIntake } from '../../services/seed';
-import { SPECIES } from '../../services/species';
+import { SPECIES, countLabel } from '../../services/species';
 import { useStore } from '../../services/store';
 import { Button } from '../../shared/components/Button';
 import { Chip } from '../../shared/components/Chip';
@@ -76,9 +76,9 @@ export function GuidancePage() {
           <div className="grid gap-2">
             <p className="text-md text-ink-2">
               Your rehoming guidance
-              {s.common ? ` for ${a.quantity ? `${a.quantity} × ` : ''}${s.common.toLowerCase()}` : ''}
+              {s.common && s.status !== 'unknown' ? ` for ${countLabel(s, a.quantity)}` : ''}
             </p>
-            <Outcome tone={tone}>
+            <Outcome tone={tone} data-tour="guidance-outcome">
               <div>
                 <Chip status={g.outcome} />
               </div>
@@ -94,7 +94,7 @@ export function GuidancePage() {
               ))}
             </ul>
           </section>
-          <section className="grid gap-3">
+          <section className="grid gap-3" data-tour="next-steps">
             <h2 className="text-lg">{g.outcome === 'eligible' ? 'Also worth doing' : 'What you can do next'}</h2>
             <ul className={reasons}>
               {next.map((x) => (

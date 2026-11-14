@@ -137,6 +137,9 @@ export const SPECIES = {
 
 export const getSpecies = (id) => SPECIES[id];
 
+/** "1 neon tetra" style label: "6 neon tetras", "1 Java fern". */
+export const countLabel = (s, n) => (+n === 1 || !n ? `1 ${s.common}` : `${n} ${s.plural || s.common.toLowerCase()}`);
+
 /** A suggested listing title: "Neon tetra needs a new home" or "6 neon tetras need a new home". */
 export const suggestTitle = (s, n) =>
   +n === 1 ? `${s.common} needs a new home` : `${n} ${s.plural || s.common.toLowerCase()} need a new home`;

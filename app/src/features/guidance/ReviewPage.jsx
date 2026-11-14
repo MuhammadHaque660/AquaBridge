@@ -22,6 +22,7 @@ export function ReviewPage() {
   const editStep = (n) => {
     update((d) => {
       d.intake.step = n;
+      d.intake.fromReview = true;
     });
     navigate('/rehome');
   };
@@ -39,7 +40,7 @@ export function ReviewPage() {
     ['How many', a.quantity, 2],
     a.kind === 'plant' && ['Growing in', a.grownIn === 'pond' ? 'Pond' : 'Aquarium', 2],
     ['Condition', CONDITION[a.condition], 3],
-    a.health && ['Problem or treatment', a.health, 3],
+    a.condition !== 'healthy' && a.health && ['Problem or treatment', a.health, 3],
     ['Reason for rehoming', REASON[a.reason], 3],
     ['Location', a.location, 4],
     ['How soon', URGENCY[a.urgency], 4],

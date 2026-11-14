@@ -90,8 +90,12 @@ export function CompatPage() {
       <div className={twoPane}>
         <div className={stackLg}>
           {!h ? (
-            <Empty title="Add a tank or pond to run the check.">
-              <Button size="sm" onClick={() => editHabitat('new')}>
+            <Empty title="Add your tank or pond to run the check">
+              <p className="text-ink-2 max-w-[56ch]">
+                Tell us its size, water temperature and pH, and whether it has a filter. You only do this once: we save
+                it to your account and use it for every listing you check.
+              </p>
+              <Button size="sm" onClick={() => editHabitat('new')} data-tour="add-first-habitat">
                 Add a tank or pond
               </Button>
             </Empty>
@@ -177,7 +181,7 @@ export function CompatPage() {
         <aside className={cx(stack, sticky)} aria-label="Listing">
           <ListingCard listing={l} />
           <div className="grid gap-2">
-            <h2 className="text-lg">What {s.common.toLowerCase()} need</h2>
+            <h2 className="text-lg">Care needs</h2>
             <dl className={kv}>
               <dt>Temperature</dt>
               <dd>

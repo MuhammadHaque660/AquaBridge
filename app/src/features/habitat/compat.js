@@ -125,7 +125,7 @@ export function normaliseHabitat(d) {
 
 export function validateHabitat(d) {
   const err = {};
-  if (!d.name?.trim()) err.name = 'Give this habitat a name.';
+  if (!d.name?.trim()) err.name = 'Enter a name for this tank or pond';
   if (d.volume !== '' && (d.volume < 5 || d.volume > 100000)) err.volume = 'Enter between 5 and 100,000 litres.';
   if (d.ph !== '' && (d.ph < 4 || d.ph > 10)) err.ph = 'pH is usually between 4 and 10.';
   if (d.tempMin !== '' && d.tempMax !== '' && d.tempMin > d.tempMax)

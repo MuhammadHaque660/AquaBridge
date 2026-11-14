@@ -190,54 +190,91 @@ app/src/
 
 ## Demo flows
 
-Open **Demo flows** from the prototype footer (or `/prototype/demos`). Each flow starts from fresh sample data. A guide panel says **who is acting**, **what they do**, **what happens behind the scenes** and **who builds it**. Press **Next step** and the prototype performs the action and highlights it. **Back** works at every step.
+Open **Demo flows** from the prototype footer (or `/prototype/demos`). Each flow starts from fresh sample data. A guide panel says **who is acting**, **what they do**, **what the system does** and **who builds it**. Press **Next step** and the prototype performs the action and highlights it. **Back** works at every step.
 
-### Flow 1 · Owner rehomes six neon tetras (11 steps)
+### Flow 1 · Owner · Rehome six neon tetras (11 steps)
 
-| # | Step | Actor | Owner |
+An owner who is moving answers the rehoming questions, can list them, signs in and publishes a listing that is already filled in.
+
+| # | Step | Actor | Built by |
 |---|---|---|---|
-| 1 | Start from the homepage, choose *Rehome* | Owner, signed out | Shared |
-| 2 | Choose animal or plant | Owner, signed out | Farhan F-01, F-02 |
-| 3 | Pick species (Neon tetra) and quantity | Owner, signed out | Farhan F-02, F-05 |
-| 4 | Condition (healthy) and reason (moving) | Owner, signed out | Farhan F-02 |
-| 5 | Town, postcode district and timing | Owner, signed out | Farhan F-02 |
-| 6 | Review answers with *Change* links | Owner, signed out | Farhan F-03 |
-| 7 | Guidance: **eligible**, intake `IC-301` | Owner, signed out | Farhan F-04 |
-| 8 | Login checkpoint remembers the editor | Owner, signed out | Shared (mock login) |
-| 9 | Listing editor, **pre-filled** from intake | Owner, signed in | Farhan F-06 → Shawn S-01 |
-| 10 | Published: `L-1051` active in My Listings | Owner, signed in | Shawn S-01, S-04, S-05 |
-| 11 | Visible in public Browse | Anyone | Shawn S-02 |
+| 1 | Start from the homepage | Owner, signed out | Shared homepage · Farhan coordinates routes |
+| 2 | Animal or plant? | Owner, signed out | Farhan · F-01, F-02 |
+| 3 | Which species, and how many? | Owner, signed out | Farhan · F-02, F-05 |
+| 4 | How is it doing? | Owner, signed out | Farhan · F-02 |
+| 5 | Where, and how soon? | Owner, signed out | Farhan · F-02 |
+| 6 | Check your answers | Owner, signed out | Farhan · F-03 |
+| 7 | Read the guidance | Owner, signed out | Farhan · F-04 |
+| 8 | Sign in only when it matters | Owner, signed out | Shared · Farhan coordinates sign-in |
+| 9 | The listing is already filled in | Owner, signed in | Farhan F-06 → Shawn S-01 |
+| 10 | Published to My listings | Owner, signed in | Shawn · S-01, S-04, S-05 |
+| 11 | Visible to adopters | Anyone | Shawn · S-02 |
 
-### Flow 2 · Adopter checks a habitat and requests Java fern (10 steps)
+### Flow 2 · Adopter · Check a tank and ask to adopt Java ferns (11 steps)
 
-| # | Step | Actor | Owner |
+A returning adopter signs in at the compatibility check, sees all three possible results, fixes a missing detail and sends a request.
+
+| # | Step | Actor | Built by |
 |---|---|---|---|
-| 1 | Browse without an account | Adopter, signed out | Shawn S-02 |
-| 2 | Open the Java fern listing | Adopter, signed out | Shawn S-03 + Farhan F-05 |
-| 3 | Login to use a saved habitat | Adopter, signed out | Shared (mock login) |
-| 4 | Result: **needs information** (pH missing) | Adopter | Midhir M-03, M-04 |
-| 5 | For comparison: **blocked** (lily vs indoor tank) | Adopter | Midhir M-04 |
-| 6 | Edit the saved habitat, add pH 6.8 | Adopter | Midhir M-01, M-02 |
-| 7 | Result: **potential match** | Adopter | Midhir M-03, M-04 |
-| 8 | Write the request | Adopter | Midhir M-06 → Shawn S-08 |
-| 9 | Request `R-512` pending in My Requests | Adopter | Midhir M-07 |
-| 10 | Owner accepts; tracker appears | Owner → adopter | Shawn S-07 → Midhir M-07 |
+| 1 | Browse without an account | Adopter, signed out | Shawn · S-02 |
+| 2 | Open a listing | Adopter, signed out | Shawn S-03 + Farhan F-05 |
+| 3 | Sign in to use a saved tank | Adopter, signed out | Shared · sign-in |
+| 4 | Result: more details needed | Adopter, signed in | Midhir · M-03, M-04 |
+| 5 | For comparison: not compatible | Adopter, signed in | Midhir · M-04 |
+| 6 | Add the missing detail | Adopter, signed in | Midhir · M-01, M-02 |
+| 7 | Result: looks suitable | Adopter, signed in | Midhir · M-03, M-04 |
+| 8 | Write the request | Adopter, signed in | Midhir M-06 → Shawn S-08 |
+| 9 | Request sent | Adopter, signed in | Midhir · M-06 |
+| 10 | Follow it in My adoption requests | Adopter, signed in | Midhir · M-07 |
+| 11 | The owner accepts | Owner → adopter | Shawn S-07 → Midhir M-07 |
 
-### Flow 3 · Owner chooses an adopter and completes the handover (11 steps)
+### Flow 3 · Owner and adopter · Choose an adopter and complete the handover (11 steps)
 
-| # | Step | Actor | Owner |
+The owner compares two requests and accepts one. Both sides confirm the handover, and the listing is marked rehomed.
+
+| # | Step | Actor | Built by |
 |---|---|---|---|
-| 1 | Two requests arrive for the goldfish | Owner | Shawn S-06 |
-| 2 | Compare owner-safe habitat summaries | Owner | Midhir M-05 → Shawn S-06 |
-| 3 | Decide: Accept or Decline | Owner | Shawn S-07 |
-| 4 | Accepted: listing **reserved** | Owner | Shawn S-07, S-08 |
-| 5 | Other request goes **on hold** | Owner | Shawn S-08 |
-| 6 | My Listings shows reserved | Owner | Shawn S-04, S-05 |
-| 7 | Owner confirms handover | Owner | Shawn S-10 |
-| 8 | The adopter’s confirmation screen | Adopter | Midhir M-09 |
-| 9 | Both confirmed: request **completed**, listing **rehomed** | System | Shawn S-08, S-10 |
-| 10 | Gone from public browsing | Anyone | Shawn S-02 |
-| 11 | Kept in the owner’s rehomed history | Owner | Shawn S-04 |
+| 1 | Two requests arrive | Owner | Shawn · S-06 |
+| 2 | Compare their tanks | Owner | Midhir M-05 → Shawn S-06 |
+| 3 | Decide | Owner | Shawn · S-07 |
+| 4 | Accepted and reserved | Owner | Shawn · S-07, S-08 |
+| 5 | The other request is put on hold | Owner | Shawn · S-08 |
+| 6 | My listings | Owner | Shawn · S-04, S-05 |
+| 7 | Owner confirms the handover | Owner | Shawn · S-07 |
+| 8 | The adopter’s side | Adopter | Midhir · M-09 |
+| 9 | Both confirmed: rehomed | System | Shawn · S-07, S-08 |
+| 10 | Gone from Browse listings | Anyone | Shawn · S-02 |
+| 11 | Kept in the owner’s history | Owner | Shawn · S-04 |
+
+### Flow 4 · New adopter · Create an account and add a first tank (10 steps)
+
+Someone new to AquaBridge creates an account at the compatibility check, adds their first tank from scratch, fills a gap and asks to adopt.
+
+| # | Step | Actor | Built by |
+|---|---|---|---|
+| 1 | Find something to adopt | New adopter, signed out | Shawn · S-03 |
+| 2 | Create an account | New adopter, signed out | Shared · REG-001, REG-005 |
+| 3 | No tank saved yet | New adopter, signed in | Midhir · M-03 |
+| 4 | Add the first tank | New adopter, signed in | Midhir · M-01 |
+| 5 | Some details are missing | New adopter, signed in | Midhir · M-02, M-04 |
+| 6 | Fill the gaps | New adopter, signed in | Midhir · M-01 |
+| 7 | Looks suitable | New adopter, signed in | Midhir · M-04 |
+| 8 | Ask to adopt | New adopter, signed in | Midhir M-06 → Shawn S-08 |
+| 9 | Request sent | New adopter, signed in | Midhir · M-06 |
+| 10 | The tank is saved for next time | New adopter, signed in | Midhir · M-02 |
+
+### Flow 5 · Owner · Restricted species and animals that need checking (6 steps)
+
+What an owner sees when a listing is not allowed: a restricted species, then an animal that is unwell. Both get clear next steps instead of an error.
+
+| # | Step | Actor | Built by |
+|---|---|---|---|
+| 1 | A restricted species | Owner, signed out | Farhan · F-02, F-05 |
+| 2 | It can’t be listed | Owner, signed out | Farhan · F-04 |
+| 3 | What to do instead | Owner, signed out | Farhan · F-04, GUID-006 |
+| 4 | An animal that is unwell | Owner, signed out | Farhan · F-02 |
+| 5 | Needs checking first | Owner, signed out | Farhan · F-04, GUID-005 |
+| 6 | Never release them | Anyone | Shared · SDG 14 |
 
 ---
 

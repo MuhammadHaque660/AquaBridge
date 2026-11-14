@@ -73,7 +73,7 @@ export function HomePage() {
             </form>
             <p className="text-md">
               Can’t keep yours any more?{' '}
-              <Link to="/rehome" className="font-semibold">
+              <Link to="/rehome" className="font-semibold" data-tour="start-rehoming">
                 Start rehoming
               </Link>
             </p>

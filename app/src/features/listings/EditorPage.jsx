@@ -35,7 +35,7 @@ function draftFromIntake(intake, user, fromIntake) {
           .join(' ')
           .trim()
       : '',
-    careNotes: a.health || '',
+    careNotes: a.condition !== 'healthy' ? a.health || '' : '',
     intakeId: fromIntake ? intake.id : null,
     created: today(),
   };
@@ -202,9 +202,11 @@ export function EditorPage() {
           </div>
           <div className={formFoot}>
             <Button type="submit">{d.status === 'active' ? 'Save changes' : 'Publish listing'}</Button>
-            <Button variant="secondary" onClick={() => save('draft')}>
-              Save as draft
-            </Button>
+            {d.status !== 'active' && (
+              <Button variant="secondary" onClick={() => save('draft')}>
+                Save as draft
+              </Button>
+            )}
           </div>
         </form>
         <aside className={cx(stack, sticky)}>

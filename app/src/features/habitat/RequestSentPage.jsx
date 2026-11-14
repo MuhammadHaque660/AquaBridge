@@ -27,7 +27,7 @@ export function RequestSentPage() {
 
   const owner = USERS[l.owner].short;
   return (
-    <div className={cx(page, 'max-w-3xl')}>
+    <div className={cx(page, 'max-w-3xl')} data-tour="request-sent">
       <Panel title="Request sent">
         Your reference
         <br />

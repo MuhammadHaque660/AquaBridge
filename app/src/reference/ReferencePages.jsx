@@ -24,9 +24,9 @@ export function DemosPage() {
   return (
     <div className={page}>
       <PageHead caption="Team tools" title="Demo flows">
-        Three guided walkthroughs covering both journeys from start to finish. Each starts from fresh sample data. A
-        guide explains what the person does, what the system does and who builds it. Press Next step and the prototype
-        does the action for you.
+        Five guided walkthroughs covering both journeys from start to finish, including a first-time adopter and the
+        cases where a listing is not allowed. Each starts from fresh sample data. A guide explains what the person does,
+        what the system does and who builds it. Press Next step and the prototype does the action for you.
       </PageHead>
       <div className="grid grid-cols-[repeat(auto-fit,minmax(300px,1fr))] items-start gap-6">
         {Object.entries(FLOWS).map(([k, f]) => (

@@ -74,7 +74,23 @@ export function MyRequestsPage() {
         <div className="grid gap-4">
           <Tracker request={r} />
           {r.adopterConfirmed ? (
-            <p className="text-sm">You have confirmed. Waiting for {owner} to confirm.</p>
+            <>
+              <p className="text-sm">You have confirmed. Waiting for {owner} to confirm.</p>
+              <DemoControl text={`${owner} confirms on their own Requests page. Use this to play their side.`}>
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  onClick={() =>
+                    run(
+                      (s) => RequestService.confirmHandover(s, r.id, l.owner),
+                      `${owner} confirmed the handover. Rehoming complete`,
+                    )
+                  }
+                >
+                  Confirm as {owner}
+                </Button>
+              </DemoControl>
+            </>
           ) : (
             <div className="grid gap-2">
               <p className="text-ink-2 text-sm">

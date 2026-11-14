@@ -129,7 +129,7 @@ function HabitatForm({ edit }) {
         Fill in what you know. You can leave gaps; the compatibility check tells you what is missing.
       </PageHead>
       <ErrorSummary errors={errors} ids={ERROR_IDS} />
-      <form noValidate onSubmit={submit} className="grid gap-8">
+      <form noValidate onSubmit={submit} className="grid gap-8" data-tour="habitat-form">
         <Field id="hname" label="Name" hint="Only you see this, for example “Living room tank”." error={errors.name}>
           <input type="text" id="hname" value={h.name} onChange={set('name')} className="max-w-md" />
         </Field>
@@ -254,7 +254,7 @@ export function HabitatPage() {
           {mine.map((h) => {
             const missing = missingCount(h);
             return (
-              <article key={h.id} className={cx(panel, 'grid content-start gap-4')}>
+              <article key={h.id} className={cx(panel, 'grid content-start gap-4')} data-tour="habitat-card">
                 <div className="grid gap-2">
                   <h2 className="text-lg">{h.name}</h2>
                   <div className="flex flex-wrap items-center gap-2">

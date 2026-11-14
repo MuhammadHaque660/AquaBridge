@@ -100,7 +100,7 @@ export function HowItWorksPage() {
         </p>
       </section>
 
-      <section id="never-release" tabIndex={-1} className="grid gap-4 focus:outline-none">
+      <section id="never-release" tabIndex={-1} className="grid gap-4 focus:outline-none" data-tour="never-release">
         <h2>Never release them</h2>
         <Warning>Do not release aquarium or pond animals or plants into rivers, lakes, ponds or drains.</Warning>
         <p>
