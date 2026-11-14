@@ -1,0 +1,160 @@
+/**
+ * Route map (SH-04). One entry per screen: its URL pattern, who builds it, and the backlog tasks and stories it covers.
+ * The build-notes strip and the screen map read from here. Use `to(name, params)` to build links.
+ */
+import { matchPath } from 'react-router';
+
+export const ROUTES = {
+  home: {
+    path: '/',
+    title: 'Homepage',
+    owner: 'Shared · Farhan coordinates routes',
+    tasks: 'Route map',
+    stories: 'CORE-003',
+  },
+  browse: {
+    path: '/browse',
+    title: 'Browse listings',
+    owner: 'Shawn',
+    tasks: 'S-02, S-09 (stretch)',
+    stories: 'LIST-004, LIST-005, LIST-006',
+  },
+  editor: {
+    path: '/listings/new',
+    alt: ['/listings/:id/edit'],
+    title: 'Listing editor',
+    owner: 'Shawn',
+    tasks: 'S-01, S-04',
+    stories: 'LIST-001, LIST-002, LIST-003',
+    auth: true,
+  },
+  listing: {
+    path: '/listings/:id',
+    title: 'Listing details',
+    owner: 'Shawn + Farhan (care data)',
+    tasks: 'S-03, F-05',
+    stories: 'LIST-004, SPEC-002, SPEC-003',
+  },
+  rehome: {
+    path: '/rehome',
+    title: 'Guided questionnaire',
+    owner: 'Farhan',
+    tasks: 'F-01, F-02, F-05',
+    stories: 'GUID-001, GUID-002, SPEC-001',
+  },
+  review: { path: '/rehome/review', title: 'Review answers', owner: 'Farhan', tasks: 'F-03', stories: 'GUID-003' },
+  guidance: {
+    path: '/rehome/guidance',
+    title: 'Guidance outcome',
+    owner: 'Farhan',
+    tasks: 'F-04, F-06',
+    stories: 'GUID-004, GUID-005, GUID-006',
+  },
+  signin: {
+    path: '/signin',
+    title: 'Sign in checkpoint',
+    owner: 'Shared · Farhan coordinates mock auth',
+    tasks: 'Mock login + return path',
+    stories: 'REG-001, REG-002, REG-005',
+  },
+  mylistings: {
+    path: '/account/listings',
+    title: 'My Listings',
+    owner: 'Shawn',
+    tasks: 'S-04, S-05',
+    stories: 'LIST-003, LIST-007',
+    auth: true,
+  },
+  incoming: {
+    path: '/account/incoming',
+    title: 'Incoming requests',
+    owner: 'Shawn + Midhir (habitat summary)',
+    tasks: 'S-06, S-07, M-05',
+    stories: 'REQ-002, REQ-003, REQ-005, REQ-006, HAB-006',
+    auth: true,
+  },
+  habitat: {
+    path: '/account/habitat',
+    alt: ['/account/habitat/:edit'],
+    title: 'My Habitat',
+    owner: 'Midhir',
+    tasks: 'M-01, M-02',
+    stories: 'HAB-001, HAB-002',
+    auth: true,
+  },
+  compat: {
+    path: '/check/:id',
+    title: 'Compatibility check',
+    owner: 'Midhir',
+    tasks: 'M-03, M-04',
+    stories: 'HAB-003, HAB-004, HAB-005',
+    auth: true,
+  },
+  request: {
+    path: '/request/:id/:hab',
+    title: 'Request adoption',
+    owner: 'Midhir (screen) → Shawn (service)',
+    tasks: 'M-06, S-08',
+    stories: 'REQ-001',
+    auth: true,
+  },
+  myrequests: {
+    path: '/account/requests',
+    title: 'My Requests',
+    owner: 'Midhir',
+    tasks: 'M-07',
+    stories: 'REQ-004, REQ-005, REQ-006, REQ-008',
+    auth: true,
+  },
+  demos: {
+    path: '/demos',
+    title: 'Demo flows',
+    owner: 'Product Owner reference',
+    tasks: 'End-to-end walkthroughs',
+    stories: 'Core journey across all epics',
+  },
+  map: {
+    path: '/map',
+    title: 'Screen map',
+    owner: 'Product Owner reference',
+    tasks: 'Sprint 1 overview',
+    stories: 'All epics',
+  },
+  design: {
+    path: '/design',
+    title: 'Design system',
+    owner: 'Shawn proposes · Midhir coordinates',
+    tasks: 'Shared style system',
+    stories: 'CORE-002, CORE-003',
+  },
+};
+
+/** Build a URL for a screen. */
+export function to(name, p = {}) {
+  switch (name) {
+    case 'listing':
+      return `/listings/${p.id}`;
+    case 'editor':
+      return p.id ? `/listings/${p.id}/edit` : `/listings/new${p.fromIntake ? '?from=intake' : ''}`;
+    case 'incoming':
+      return `/account/incoming${p.listing ? `?listing=${p.listing}` : ''}`;
+    case 'habitat':
+      return p.edit ? `/account/habitat/${p.edit}` : '/account/habitat';
+    case 'compat':
+      return `/check/${p.id}${p.hab ? `?hab=${p.hab}` : ''}`;
+    case 'request':
+      return `/request/${p.id}/${p.hab}`;
+    case 'signin':
+      return `/signin${p.tab ? `?tab=${p.tab}` : ''}`;
+    default:
+      return (ROUTES[name] || ROUTES.home).path;
+  }
+}
+
+/** Which screen a pathname belongs to (for the build notes and nav highlighting). */
+export function routeName(pathname) {
+  for (const [name, r] of Object.entries(ROUTES)) {
+    if ([r.path, ...(r.alt || [])].some((p) => matchPath({ path: p, end: true }, pathname))) return name;
+  }
+  return 'home';
+}

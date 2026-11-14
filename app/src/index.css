@@ -1,0 +1,317 @@
+@import 'tailwindcss';
+
+/*
+  Coastal Trust design tokens (light only).
+  Every colour, font, size and radius used in the app comes from here, so use these utilities
+  (bg-primary, text-ink-2, rounded-ab, font-display …) and never raw hex values or Tailwind's default palette.
+*/
+@theme {
+  --color-*: initial;
+  --color-white: #ffffff;
+  --color-black: #000000;
+  --color-transparent: transparent;
+  --color-current: currentColor;
+  --color-mist: #f4f8f7; /* Coastal Mist: page ground */
+  --color-surface: #ffffff; /* Cards, forms, panels */
+  --color-surface-2: #eaf3f0; /* Quiet fills, table heads, build-notes strip */
+  --color-line: #d3e3de; /* Shoreline: borders and dividers */
+  --color-ink: #12324a; /* Deep Ocean: headings and body text */
+  --color-ink-2: #4e6677; /* Tide Grey: secondary text */
+  --color-primary: #0b7a6e; /* Ocean Teal: primary actions, links */
+  --color-primary-hover: #08635a;
+  --color-primary-soft: #ddf3ec; /* Seafoam tint: selected states, info panels */
+  --color-weed: #5cc4a6; /* Seafoam: logo wave and small highlights */
+  --color-weed-soft: #c9efe2;
+  --color-ok: #1f7a4d; /* Match */
+  --color-ok-soft: #ddf1e5;
+  --color-warn: #965a00; /* Caution */
+  --color-warn-soft: #fcefd5;
+  --color-bad: #b4352c; /* Stop */
+  --color-bad-soft: #fbe3e0;
+  --color-mute-soft: #e6eeec;
+  --color-plate-trop: #d6efe9;
+  --color-plate-cold: #dee8f2;
+  --color-plate-plant: #e0efd9;
+  --color-plate-pond: #edebd5;
+
+  --font-display: 'Familjen Grotesk', 'Segoe UI', system-ui, sans-serif;
+  --font-body: 'Atkinson Hyperlegible', 'Segoe UI', system-ui, sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, Consolas, monospace;
+
+  /* Type scale: 13 · 15 · 16 · 20 · 26 · 34 · 52 px. Sizes inherit line-height from their parent. */
+  --text-*: initial;
+  --text-xs: 0.8125rem;
+  --text-sm: 0.9375rem;
+  --text-md: 1rem;
+  --text-lg: 1.25rem;
+  --text-xl: 1.625rem;
+  --text-2xl: 2.125rem;
+  --text-3xl: clamp(2.25rem, 5vw, 3.25rem);
+
+  --radius-ab: 6px;
+  --radius-ab-sm: 3px;
+  --container-page: 1180px;
+
+  /* Breakpoints: sm 640px · md 760px · lg 900px (two-pane layouts and the desktop menu start at lg) */
+  --breakpoint-*: initial;
+  --breakpoint-sm: 40rem;
+  --breakpoint-md: 47.5rem;
+  --breakpoint-lg: 56.25rem;
+}
+
+@layer base {
+  html {
+    color-scheme: light;
+  }
+  body {
+    background: var(--color-mist);
+    color: var(--color-ink);
+    font-family: var(--font-body);
+    font-size: 1rem;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-display);
+    line-height: 1.15;
+    text-wrap: balance;
+    letter-spacing: -0.01em;
+  }
+  h1 {
+    font-size: var(--text-2xl);
+    font-weight: 700;
+  }
+  h2 {
+    font-size: var(--text-xl);
+    font-weight: 650;
+  }
+  h3 {
+    font-size: var(--text-lg);
+    font-weight: 600;
+  }
+  a {
+    color: var(--color-primary);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  a:hover {
+    color: var(--color-primary-hover);
+  }
+  :focus-visible {
+    outline: 3px solid var(--color-primary);
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+  input:is([type='text'], [type='email'], [type='password'], [type='number']),
+  select,
+  textarea {
+    font: inherit;
+    color: var(--color-ink);
+    background: var(--color-surface);
+    border: 1px solid var(--color-line);
+    border-radius: var(--radius-ab-sm);
+    padding: 10px 12px;
+    width: 100%;
+    min-width: 0;
+  }
+  input:hover,
+  select:hover,
+  textarea:hover {
+    border-color: var(--color-ink-2);
+  }
+  textarea {
+    min-height: 112px;
+    resize: vertical;
+  }
+  button {
+    cursor: pointer;
+  }
+}
+
+/*
+  The few patterns that are clearer as CSS than as utilities:
+  field error outlines, numbered step lists, the handover tracker, the aquarium animation and the demo highlight.
+*/
+@layer components {
+  .has-error :is(input, select, textarea) {
+    border-color: var(--color-bad);
+    box-shadow: 0 0 0 1px var(--color-bad);
+  }
+
+  .steps {
+    display: grid;
+    counter-reset: s;
+  }
+  .steps > li {
+    counter-increment: s;
+    display: grid;
+    grid-template-columns: 36px 1fr;
+    gap: 12px;
+    padding: 12px 0;
+    border-top: 1px solid var(--color-line);
+  }
+  .steps > li::before {
+    content: counter(s);
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    color: var(--color-primary);
+    padding-top: 1px;
+  }
+
+  .track {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+  .track > li {
+    position: relative;
+    display: grid;
+    gap: 6px;
+    padding-top: 22px;
+    font-size: var(--text-xs);
+    color: var(--color-ink-2);
+  }
+  .track > li::before {
+    content: '';
+    position: absolute;
+    top: 5px;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: var(--color-line);
+  }
+  .track > li::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--color-surface);
+    border: 2px solid var(--color-line);
+  }
+  .track > li.done {
+    color: var(--color-ink);
+  }
+  .track > li.done::before {
+    background: var(--color-primary);
+  }
+  .track > li.done::after {
+    background: var(--color-primary);
+    border-color: var(--color-primary);
+  }
+  .track > li.now {
+    color: var(--color-ink);
+    font-weight: 700;
+  }
+  .track > li.now::after {
+    border-color: var(--color-primary);
+  }
+  @media (max-width: 520px) {
+    .track {
+      grid-template-columns: 1fr;
+      gap: 8px;
+    }
+    .track > li {
+      padding: 0 0 0 24px;
+    }
+    .track > li::before {
+      display: none;
+    }
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .swim-a {
+      animation: bob 6s ease-in-out infinite;
+    }
+    .swim-b {
+      animation: bob 4.6s ease-in-out -1.2s infinite;
+    }
+    .swim-c {
+      animation: bob 5.4s ease-in-out -2.6s infinite;
+    }
+    .sway {
+      transform-box: fill-box;
+      transform-origin: 50% 100%;
+      animation: sway 7s ease-in-out infinite;
+    }
+    .sway-2 {
+      animation-delay: -3s;
+    }
+    .bub {
+      transform-box: fill-box;
+      animation: rise 3.6s linear infinite;
+    }
+    .bub:nth-of-type(2) {
+      animation-delay: -0.7s;
+    }
+    .bub:nth-of-type(3) {
+      animation-delay: -1.4s;
+    }
+    .bub:nth-of-type(4) {
+      animation-delay: -2.1s;
+    }
+    .bub:nth-of-type(5) {
+      animation-delay: -2.8s;
+    }
+    .tour-hl {
+      animation: hl 1.4s ease-in-out 3;
+    }
+  }
+
+  .tour-hl {
+    outline: 3px solid var(--color-weed) !important;
+    outline-offset: 4px;
+    border-radius: 4px;
+  }
+  body.touring main {
+    padding-bottom: 360px;
+  }
+  @media (max-width: 640px) {
+    body.touring main {
+      padding-bottom: 52vh;
+    }
+  }
+}
+
+@keyframes bob {
+  0%,
+  100% {
+    transform: translate(0, 0);
+  }
+  50% {
+    transform: translate(12px, -7px);
+  }
+}
+@keyframes sway {
+  0%,
+  100% {
+    transform: rotate(-2.5deg);
+  }
+  50% {
+    transform: rotate(2.5deg);
+  }
+}
+@keyframes rise {
+  0% {
+    transform: translateY(0);
+    opacity: 0.95;
+  }
+  100% {
+    transform: translateY(-34px);
+    opacity: 0.15;
+  }
+}
+@keyframes hl {
+  50% {
+    outline-offset: 9px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition: none !important;
+  }
+}

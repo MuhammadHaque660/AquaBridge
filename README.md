@@ -12,22 +12,23 @@
 <p align="center">
   <a href="https://aquabridge-zeta.vercel.app"><b>Live site</b></a> ·
   <a href="https://aquabridge-zeta.vercel.app/prototype/">Prototype</a> ·
-  <a href="https://aquabridge-zeta.vercel.app/prototype/#demos">Demo flows</a> ·
+  <a href="https://aquabridge-zeta.vercel.app/prototype/demos">Demo flows</a> ·
   <a href="https://aquabridge-zeta.vercel.app/backlog/">Sprint 1 backlog</a> ·
-  <a href="https://aquabridge-zeta.vercel.app/prototype/#design">Design system</a> ·
+  <a href="https://aquabridge-zeta.vercel.app/prototype/design">Design system</a> ·
   <a href="https://dsouzashawn305.atlassian.net/jira/software/projects/KAN/boards/1">Jira (KAN)</a>
 </p>
 
 ---
 
 > [!NOTE]
-> This repository holds the **Sprint 1 design reference**: a clickable front-end prototype with sample data, guided demo flows and the detailed backlog. It is the visual spec for the real app, not the app itself. Guidance and compatibility results are illustrative examples, **not** legal or biological advice.
+> This repository holds the **Sprint 1 front end**: a React + Vite + Tailwind app with sample data, guided demo flows and the detailed backlog. It started as the clickable design prototype and is now the codebase the team builds on. Guidance and compatibility results are illustrative examples, **not** legal or biological advice.
 
 ## Contents
 
 - [What AquaBridge does](#what-aquabridge-does)
 - [Quick start](#quick-start)
 - [What’s in this repo](#whats-in-this-repo)
+- [Tech stack and development](#tech-stack-and-development)
 - [Using the prototype](#using-the-prototype)
 - [Demo flows](#demo-flows)
 - [Design system](#design-system)
@@ -69,14 +70,11 @@ flowchart LR
 
 ## Quick start
 
-No build step and no dependencies. It’s plain HTML, CSS and JavaScript.
-
 | Option | How |
 |---|---|
 | **Live site** | **https://aquabridge-zeta.vercel.app** (updates automatically on every push to `main`) |
-| Open directly | Double-click `index.html`, or open `prototype/index.html` in a browser |
-| Local server | `npx serve .` then visit the address it prints |
-| Python | `python -m http.server 8000` then visit http://localhost:8000 |
+| Run the app locally | `cd app` → `npm install` → `npm run dev`, then open http://localhost:5173 |
+| Original static prototype | Open `static-prototype/index.html` in a browser (kept for comparison) |
 
 > [!TIP]
 > Sample data and your clicks are saved in your browser. Use **Reset sample data** in the prototype footer to start fresh.
@@ -88,8 +86,9 @@ No build step and no dependencies. It’s plain HTML, CSS and JavaScript.
 ```text
 .
 ├── index.html                  Team hub: links to everything below
-├── prototype/
-│   └── index.html              The clickable prototype (all screens, demo flows, design system)
+├── app/                        The React app (deployed at /prototype/) — see "Tech stack and development"
+├── static-prototype/
+│   └── index.html              The original single-file prototype, kept for side-by-side comparison
 ├── backlog/
 │   └── index.html              Sprint 1 backlog page (generated, filter by person and week)
 ├── planning/
@@ -97,9 +96,60 @@ No build step and no dependencies. It’s plain HTML, CSS and JavaScript.
 │   ├── backlog.template.html   Template for the backlog page
 │   └── sprint1-jira-import.csv Jira CSV import (generated)
 ├── tools/
-│   └── build.js                Rebuilds backlog/index.html and the CSV from the JSON
+│   ├── build.js                Rebuilds backlog/index.html and the CSV from the JSON
+│   └── build-site.js           Builds the whole Vercel site into dist/ (run by Vercel)
+├── vercel.json                 Vercel build settings and the /prototype/ page rewrite
 └── docs/assets/                Aquarium illustration and colour swatches used in this README
 ```
+
+---
+
+## Tech stack and development
+
+| Layer | Choice | Notes |
+|---|---|---|
+| Framework | **React 19 + Vite** | `app/` · fast dev server, static build |
+| Language | **JavaScript** | Shared data shapes are documented with JSDoc in `src/services/contracts.js` |
+| Styling | **Tailwind CSS v4** | Coastal Trust tokens live in `@theme` in `src/index.css` (`bg-primary`, `text-ink-2`, `rounded-ab` …) |
+| Routing | **React Router** | Real URLs per screen; signed-out users are sent to login and back (`RequireAuth`) |
+| State | React context + `localStorage` | `src/services/store.jsx`: `update(s => …)` changes a copy, saves and re-renders |
+| Tests | **Vitest + React Testing Library** | `npm test` |
+| Quality | ESLint + Prettier (with the Tailwind class sorter) | `npm run lint` · `npm run format` |
+
+```bash
+cd app
+npm install      # first time only
+npm run dev      # http://localhost:5173
+npm test         # 19 tests: request service, guidance and compatibility rules, routing
+npm run lint
+npm run build    # production build into app/dist
+```
+
+### Where the code lives
+
+```text
+app/src/
+├── index.css            Tailwind + Coastal Trust design tokens (the only place colours are defined)
+├── routes.js            Every screen: URL, owner, Sprint 1 tasks and stories (drives the build notes and screen map)
+├── App.jsx              Route table
+├── shared/              Midhir · SH-02/SH-09 components (Button, Chip, Field, Notice, Plate, Tracker), Layout, hooks
+├── services/            Shared · contracts, species catalogue, sample data, RequestService, store (mock auth)
+├── features/
+│   ├── home/            Homepage
+│   ├── listings/        Shawn · browse, listing page, editor, My Listings, incoming requests
+│   ├── guidance/        Farhan · questionnaire, review, guidance rules, care widget
+│   ├── habitat/         Midhir · My Habitat, compatibility rules and page, request form, My Requests
+│   └── auth/            Sign-in checkpoint (replaced by the university login later)
+└── reference/           Prototype-only: demo flows engine, screen map, design system page
+```
+
+### Rules of thumb
+
+- **Use the tokens.** `bg-primary`, `text-ink`, `border-line`, `rounded-ab`. Tailwind's default colour palette is switched off on purpose, so `bg-teal-600` won't work.
+- **Reuse `shared/` components** instead of repeating long class lists. If a pattern appears twice, make it a component.
+- **Change state only through `update()` or `run()`** from `useStore()`, and request state only through `services/requestService.js`.
+- **Read species only through `getSpecies` / `listSpecies`** (`services/species.js`).
+- Work mostly inside your own `features/` folder to avoid merge conflicts.
 
 ---
 
@@ -123,7 +173,7 @@ No build step and no dependencies. It’s plain HTML, CSS and JavaScript.
 | **Build notes strip** | The grey bar under the header names each screen’s owner, Sprint 1 task IDs and backlog stories. Toggle it from the footer. |
 | **Demo controls** | Dashed amber boxes let you play the *other* person (e.g. “Owner accepts”). They exist only in the prototype. |
 | **Reset sample data** | Footer link. Restores every listing, habitat and request. |
-| **Direct links** | Add `#browse`, `#rehome`, `#demos`, `#map` or `#design` to the prototype URL to open that page. |
+| **Direct links** | Every screen has its own address, e.g. `/prototype/browse`, `/prototype/listings/L-1045`, `/prototype/demos`. Old `#demos`-style links still redirect. |
 
 ### Sample outcomes to try
 
@@ -140,7 +190,7 @@ No build step and no dependencies. It’s plain HTML, CSS and JavaScript.
 
 ## Demo flows
 
-Open **Demo flows** from the prototype footer (or `prototype/#demos`). Each flow starts from fresh sample data. A guide panel says **who is acting**, **what they do**, **what happens behind the scenes** and **who builds it**. Press **Next step** and the prototype performs the action and highlights it. **Back** works at every step.
+Open **Demo flows** from the prototype footer (or `/prototype/demos`). Each flow starts from fresh sample data. A guide panel says **who is acting**, **what they do**, **what happens behind the scenes** and **who builds it**. Press **Next step** and the prototype performs the action and highlights it. **Back** works at every step.
 
 ### Flow 1 · Owner rehomes six neon tetras (11 steps)
 
@@ -359,11 +409,16 @@ The site is live at **https://aquabridge-zeta.vercel.app**. It's the Vercel proj
 | `main` | Production deploy to https://aquabridge-zeta.vercel.app within about a minute |
 | Any other branch | A preview deploy with its own URL, shown on the pull request |
 
-The site is static, so there is no framework, build command or environment variable. To set it up again from scratch:
+Build settings live in `vercel.json`, so nothing needs setting in the dashboard:
 
-1. In Vercel: **Add New → Project →** import `shawn-d123/AquaBridge`.
-2. Framework preset **Other**, leave the build command empty, output directory `.` (the repo root).
-3. Deploy. The root URL opens the team hub; `/prototype/` and `/backlog/` open the pages.
+| Setting | Value |
+|---|---|
+| Install | `npm --prefix app ci` |
+| Build | `node tools/build-site.js` (builds the React app with base `/prototype/` and copies the hub, backlog and static prototype into `dist/`) |
+| Output | `dist` |
+| Rewrite | `/prototype/*` → `/prototype/index.html`, so every app URL loads the app |
+
+To set it up again from scratch: in Vercel **Add New → Project →** import `shawn-d123/AquaBridge`, keep the defaults and deploy. The root URL opens the team hub; `/prototype/`, `/backlog/` and `/static-prototype/` open the pages.
 
 > [!IMPORTANT]
 > A Vercel link is public to anyone who has it. The data is fictional, but turn on **Vercel Authentication / password protection** in the project settings if you want it private to the team.
