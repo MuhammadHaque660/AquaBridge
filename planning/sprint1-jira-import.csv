@@ -64,6 +64,7 @@ h3. What to build
 * Form controls: text input, number input, select, textarea, checkbox, large radio, field label, hint, error message and an error summary; optional fields marked “(optional)”
 * Status tag: one rectangular component that takes any listing, request, guidance or compatibility status value and shows the colour and the wording people see
 * Panel, notice (info, success, warning, error) and page header
+* Tabs with counts (My listings) and radio lists with counts (Browse filters, Species guide)
 * Species illustration: one picture per species in the style of the homepage aquarium, used until owners can upload photos
 * Component examples page so others can copy usage
 
@@ -138,6 +139,7 @@ h3. What to build
 * Homepage in order: plain headline and one-paragraph summary, search box (species or town) that opens Browse listings, ‘Start rehoming’ link, aquarium illustration; Recently listed (4 cards); short ‘Rehoming yours’ and ‘Adopting’ sections; ‘Never release them’ warning
 * Footer: Using AquaBridge links (including Accessibility, Privacy, Contact), For the team links, Project links, and the sample-data note
 * Content pages: How it works, Accessibility, Privacy, Contact
+* ‘Skip to main content’ link as the first thing on every page; each page’s browser title matches its heading (‘My listings · AquaBridge’); new pages open scrolled to the top
 * Routes for every screen plus a not-found page
 
 h3. States to handle
@@ -177,7 +179,7 @@ h3. What to build
 * Sign in and Create an account on one page, with a link to switch: name (create only), email, password, submit
 * ‘You’ll go back to: …’ notice when the user arrived from a guarded action
 * Auth module: currentUser, signIn, signOut, requireAuth(route) used by every guarded route
-* Pending-action store: remembers route and item ID (e.g. listing L-1044) in session storage, never in the URL
+* Pending-action store: remembers the route and item ID (e.g. listing L-1044) outside the URL; the prototype keeps it in the app store, session storage is also fine
 * Sign out from the account menu
 
 h3. States to handle
