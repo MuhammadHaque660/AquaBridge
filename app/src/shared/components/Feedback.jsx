@@ -1,3 +1,4 @@
+import { Link } from 'react-router';
 import { useStore } from '../../services/store';
 import { caption, cx } from '../styles';
 
@@ -122,14 +123,13 @@ export function PageHead({ caption: cap, eyebrow, crumb, title, children, classN
   return <div className={cx('mb-10', className)}>{head}</div>;
 }
 
-/** Back link at the top of a page. */
-export function BackLink({ children = 'Back', ...rest }) {
+/** Back link at the top of a page. Pass `to` (a router path, so the deployed base path is kept). */
+export function BackLink({ children = 'Back', to, ...rest }) {
+  const cls =
+    "inline-flex items-center gap-1.5 text-sm text-ink underline underline-offset-3 hover:text-ink before:inline-block before:size-2 before:-rotate-45 before:border-t-2 before:border-l-2 before:border-current before:content-['']";
   return (
-    <a
-      className="text-ink hover:text-ink inline-flex items-center gap-1.5 text-sm underline underline-offset-3 before:inline-block before:size-2 before:-rotate-45 before:border-t-2 before:border-l-2 before:border-current before:content-['']"
-      {...rest}
-    >
+    <Link to={to} className={cls} {...rest}>
       {children}
-    </a>
+    </Link>
   );
 }

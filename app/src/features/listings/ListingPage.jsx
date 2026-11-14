@@ -1,5 +1,6 @@
 import { Link, useParams } from 'react-router';
 import { to } from '../../routes';
+import { CareList } from '../guidance/CareList';
 import { CONDITION, URGENCY, USERS } from '../../services/contracts';
 import { byId } from '../../services/seed';
 import { speciesFor } from '../../services/species';
@@ -155,34 +156,7 @@ export function ListingPage() {
           <section className="grid gap-3">
             <h2 className="text-xl">Care needs</h2>
             <p className={readable}>{s.care}</p>
-            {s.temp && (
-              <dl className={kv}>
-                <dt>Water temperature</dt>
-                <dd>
-                  {s.temp[0]} to {s.temp[1]}°C
-                </dd>
-                <dt>pH</dt>
-                <dd>
-                  {s.ph[0].toFixed(1)} to {s.ph[1].toFixed(1)}
-                </dd>
-                <dt>Smallest tank or pond</dt>
-                <dd>{s.minVol} litres</dd>
-                <dt>Lives in</dt>
-                <dd className="first-letter:uppercase">{s.habitats.join(' or ')}</dd>
-                {s.minDepth && (
-                  <>
-                    <dt>Planting depth</dt>
-                    <dd>At least {s.minDepth} cm</dd>
-                  </>
-                )}
-                {s.light && (
-                  <>
-                    <dt>Light</dt>
-                    <dd>{s.light[0].toUpperCase() + s.light.slice(1)}</dd>
-                  </>
-                )}
-              </dl>
-            )}
+            <CareList species={s} />
             <p className="text-ink-2 text-sm">
               Care ranges are sample reference data and have not been checked by a specialist.
             </p>

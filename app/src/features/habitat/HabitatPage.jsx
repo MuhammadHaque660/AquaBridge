@@ -116,7 +116,7 @@ function HabitatForm({ edit }) {
         title={h.id ? `Edit ${existing?.name || 'tank or pond'}` : 'Add a tank or pond'}
         crumb={
           <BackLink
-            href="/account/habitat"
+            to="/account/habitat"
             onClick={(e) => {
               e.preventDefault();
               cancel();
@@ -254,7 +254,7 @@ export function HabitatPage() {
           {mine.map((h) => {
             const missing = missingCount(h);
             return (
-              <article key={h.id} className={cx(panel, 'grid content-start gap-4')} data-tour="habitat-card">
+              <article key={h.id} className={cx(panel, 'flex flex-col gap-4')} data-tour="habitat-card">
                 <div className="grid gap-2">
                   <h2 className="text-lg">{h.name}</h2>
                   <div className="flex flex-wrap items-center gap-2">
@@ -267,7 +267,7 @@ export function HabitatPage() {
                   </div>
                 </div>
                 <HabitatSummary habitat={h} />
-                <div>
+                <div className="mt-auto pt-2">
                   <Button variant="secondary" size="sm" onClick={() => go('habitat', { edit: h.id })}>
                     Edit<span className="sr-only"> {h.name}</span>
                   </Button>

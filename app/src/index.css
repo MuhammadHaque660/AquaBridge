@@ -15,7 +15,7 @@
   --color-surface: #ffffff; /* Page background, cards, forms */
   --color-surface-2: #eef2f2; /* Table heads, secondary buttons, insets */
   --color-line: #d4dcdc; /* Borders and dividers */
-  --color-line-strong: #8a9a9e; /* Form field borders: 3:1 contrast */
+  --color-line-strong: #7a8a8f; /* Form field borders: 3.6:1 contrast (WCAG non-text minimum is 3:1) */
   --color-ink: #13293d; /* Headings and body text */
   --color-ink-2: #4b5f6b; /* Secondary text and hints */
   --color-primary: #0a6b60; /* The one accent: primary buttons and links */
@@ -56,11 +56,12 @@
   --container-page: 1200px;
   --shadow-card: 0 1px 2px rgb(19 41 61 / 0.06), 0 2px 8px rgb(19 41 61 / 0.06);
 
-  /* Breakpoints: sm 640px · md 760px · lg 900px (two-pane layouts and the desktop menu start at lg) */
+  /* Breakpoints: sm 640px · md 760px · lg 900px (two-pane layouts start here) · xl 1080px (full header) */
   --breakpoint-*: initial;
   --breakpoint-sm: 40rem;
   --breakpoint-md: 47.5rem;
   --breakpoint-lg: 56.25rem;
+  --breakpoint-xl: 67.5rem; /* header switches to the Menu button below 1080px */
 }
 
 @layer base {

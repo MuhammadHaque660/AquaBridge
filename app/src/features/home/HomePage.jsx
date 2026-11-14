@@ -26,8 +26,6 @@ export function Steps({ items }) {
   );
 }
 
-export const pathCard = 'grid content-start gap-4 rounded-ab bg-mist p-6';
-
 /** Homepage (SH-04): search first, then real listings, then a short explanation of each journey. */
 export function HomePage() {
   const { state } = useStore();

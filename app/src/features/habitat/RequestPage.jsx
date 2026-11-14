@@ -75,7 +75,7 @@ export function RequestPage() {
         title={`Ask ${firstName} to adopt`}
         crumb={
           <BackLink
-            href={to('compat', { id: l.id })}
+            to={to('compat', { id: l.id })}
             onClick={(e) => (e.preventDefault(), go('compat', { id: l.id }, { hab: h.id }))}
           >
             Back to the compatibility check

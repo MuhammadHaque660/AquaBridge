@@ -243,7 +243,7 @@ export function RehomePage() {
       <p className="mb-8">
         {n > 1 ? (
           <BackLink
-            href="#"
+            to="/rehome"
             onClick={(e) => {
               e.preventDefault();
               goStep(n - 1);
@@ -253,7 +253,7 @@ export function RehomePage() {
           </BackLink>
         ) : (
           <BackLink
-            href="/"
+            to="/"
             onClick={(e) => {
               e.preventDefault();
               navigate('/');

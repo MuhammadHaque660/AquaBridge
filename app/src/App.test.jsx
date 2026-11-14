@@ -33,4 +33,36 @@ describe('App', () => {
     await userEvent.click(screen.getByRole('button', { name: 'Sign in as the sample user' }));
     expect(await screen.findByRole('heading', { name: 'My adoption requests' })).toBeInTheDocument();
   });
+
+  it('sign-in shows an error summary for a badly formatted email', async () => {
+    renderAt('/signin');
+    const email = await screen.findByLabelText('Email address');
+    await userEvent.clear(email);
+    await userEvent.type(email, 'jordan@');
+    await userEvent.click(screen.getByRole('button', { name: /^Sign in as the sample user/ }));
+    expect(screen.getByRole('heading', { name: 'There is a problem' })).toBeInTheDocument();
+    expect(screen.getAllByText(/correct format/).length).toBeGreaterThan(0);
+  });
+
+  it('species guide searches by name and marks restricted species', async () => {
+    renderAt('/species');
+    await userEvent.type(await screen.findByLabelText('Search by name'), 'slider');
+    expect(screen.getByRole('link', { name: 'Red-eared slider' })).toBeInTheDocument();
+    expect(screen.getByText(/Restricted: cannot be listed/)).toBeInTheDocument();
+  });
+
+  it('a valid request ends on a confirmation page with a reference', async () => {
+    const state = seed();
+    state.user = 'U-01';
+    state.requests = state.requests.filter((r) => r.adopter !== 'U-01');
+    renderAt('/request/L-1045/H-201', state);
+    await userEvent.type(
+      await screen.findByLabelText(/Introduce yourself/),
+      'Hello Tom, I have a heated 120 litre tank ready for them.',
+    );
+    await userEvent.click(screen.getByLabelText(/I understand/));
+    await userEvent.click(screen.getByRole('button', { name: /^Send/ }));
+    expect(await screen.findByRole('heading', { name: 'Request sent' })).toBeInTheDocument();
+    expect(screen.getByText('R-512')).toBeInTheDocument();
+  });
 });

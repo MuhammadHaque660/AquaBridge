@@ -9,7 +9,7 @@ export const ROUTES = {
     path: '/',
     title: 'Home',
     owner: 'Shared · Farhan coordinates routes',
-    tasks: 'Route map',
+    tasks: 'SH-04',
     stories: 'CORE-003',
   },
   browse: {
@@ -54,8 +54,8 @@ export const ROUTES = {
     path: '/signin',
     title: 'Sign in',
     owner: 'Shared · Farhan coordinates mock auth',
-    tasks: 'Mock login + return path',
-    stories: 'REG-001, REG-002, REG-005',
+    tasks: 'SH-05',
+    stories: 'REG-001, REG-002, REG-003, REG-004, REG-005',
   },
   mylistings: {
     path: '/account/listings',
@@ -69,7 +69,7 @@ export const ROUTES = {
     path: '/account/incoming',
     title: 'Requests for my listings',
     owner: 'Shawn + Midhir (habitat summary)',
-    tasks: 'S-06, S-07, M-05',
+    tasks: 'S-06, S-07, S-10, M-05',
     stories: 'REQ-002, REQ-003, REQ-005, REQ-006, HAB-006',
     auth: true,
   },
@@ -102,9 +102,23 @@ export const ROUTES = {
     path: '/account/requests',
     title: 'My adoption requests',
     owner: 'Midhir',
-    tasks: 'M-07',
+    tasks: 'M-07, M-09',
     stories: 'REQ-004, REQ-005, REQ-006, REQ-008',
     auth: true,
+  },
+  species: {
+    path: '/species',
+    title: 'Species guide',
+    owner: 'Farhan',
+    tasks: 'F-08, F-05',
+    stories: 'SPEC-001, SPEC-002, SPEC-003',
+  },
+  speciesDetail: {
+    path: '/species/:id',
+    title: 'Species page',
+    owner: 'Farhan',
+    tasks: 'F-08, F-05',
+    stories: 'SPEC-002, SPEC-003',
   },
   sent: {
     path: '/account/requests/sent/:id',
@@ -118,7 +132,7 @@ export const ROUTES = {
     path: '/how-it-works',
     title: 'How it works',
     owner: 'Shared · Farhan coordinates routes',
-    tasks: 'Route map',
+    tasks: 'SH-04',
     stories: 'CORE-003, GUID-006',
   },
   privacy: { path: '/privacy', title: 'Privacy', owner: 'Shared', tasks: 'Footer pages', stories: 'CORE-001' },
@@ -134,7 +148,7 @@ export const ROUTES = {
     path: '/team',
     title: 'Team reference',
     owner: 'Product Owner reference',
-    tasks: 'Sprint 1 overview',
+    tasks: 'SH-01, SH-03, SH-06',
     stories: 'All epics',
     team: true,
   },
@@ -151,7 +165,7 @@ export const ROUTES = {
     team: true,
     title: 'Demo flows',
     owner: 'Product Owner reference',
-    tasks: 'End-to-end walkthroughs',
+    tasks: 'SH-07, F-07, M-08',
     stories: 'Core journey across all epics',
   },
   map: {
@@ -167,7 +181,7 @@ export const ROUTES = {
     team: true,
     title: 'Design system',
     owner: 'Shawn proposes · Midhir coordinates',
-    tasks: 'Shared style system',
+    tasks: 'SH-02, SH-08, SH-09',
     stories: 'CORE-002, CORE-003',
   },
 };
@@ -189,6 +203,8 @@ export function to(name, p = {}) {
       return `/request/${p.id}/${p.hab}`;
     case 'screen':
       return `/team/screens/${p.name}`;
+    case 'speciesDetail':
+      return `/species/${p.id}`;
     case 'sent':
       return `/account/requests/sent/${p.id}`;
     case 'signin':

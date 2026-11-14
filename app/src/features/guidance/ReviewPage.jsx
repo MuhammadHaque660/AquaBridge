@@ -1,4 +1,4 @@
-import { useNavigate } from 'react-router';
+import { Link, useNavigate } from 'react-router';
 import { CONDITION, REASON, URGENCY } from '../../services/contracts';
 import { SPECIES } from '../../services/species';
 import { useStore } from '../../services/store';
@@ -51,7 +51,7 @@ export function ReviewPage() {
     <div className={page}>
       <p className="mb-8">
         <BackLink
-          href="/rehome"
+          to="/rehome"
           onClick={(e) => {
             e.preventDefault();
             editStep(4);
@@ -72,15 +72,15 @@ export function ReviewPage() {
                 <dt className="font-semibold max-sm:col-span-2">{k}</dt>
                 <dd className={cx('m-0', !v && 'text-ink-2')}>{v || 'Not given'}</dd>
                 <dd className="m-0 text-right">
-                  <a
-                    href="/rehome"
+                  <Link
+                    to="/rehome"
                     onClick={(e) => {
                       e.preventDefault();
                       editStep(step);
                     }}
                   >
                     Change<span className="sr-only"> {k.toLowerCase()}</span>
-                  </a>
+                  </Link>
                 </dd>
               </div>
             ))}

@@ -715,6 +715,16 @@ export const FLOWS = {
       },
       {
         actor: 'Owner, signed out',
+        title: 'Look it up in the species guide',
+        route: 'speciesDetail',
+        params: { id: 'SP-008' },
+        hl: 'species-care',
+        say: 'The species guide explains the restriction and links to what to do instead. The guide is open to everyone, not only owners.',
+        sys: 'Species page for <code>SP-008</code>, from the same catalogue the questionnaire uses.',
+        who: 'Farhan · F-08',
+      },
+      {
+        actor: 'Owner, signed out',
         title: 'An animal that is unwell',
         route: 'rehome',
         hl: 'intake-condition',

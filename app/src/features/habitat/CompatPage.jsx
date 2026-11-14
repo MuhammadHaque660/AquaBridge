@@ -10,7 +10,8 @@ import { Chip } from '../../shared/components/Chip';
 import { BackLink, Empty, PageHead } from '../../shared/components/Feedback';
 import { Field } from '../../shared/components/Form';
 import { useGo, useUi } from '../../shared/hooks';
-import { cx, kv, page, row, stack, stackLg, sticky, twoPane } from '../../shared/styles';
+import { cx, page, row, stack, stackLg, sticky, twoPane } from '../../shared/styles';
+import { CareList } from '../guidance/CareList';
 import { Outcome } from '../guidance/GuidancePage';
 import { ListingCard } from '../listings/ListingCard';
 import { evaluateCompat } from './compat';
@@ -77,10 +78,7 @@ export function CompatPage() {
       <PageHead
         title="Check if your tank or pond is suitable"
         crumb={
-          <BackLink
-            href={to('listing', { id: l.id })}
-            onClick={(e) => (e.preventDefault(), go('listing', { id: l.id }))}
-          >
+          <BackLink to={to('listing', { id: l.id })} onClick={(e) => (e.preventDefault(), go('listing', { id: l.id }))}>
             Back to {l.title}
           </BackLink>
         }
@@ -182,26 +180,7 @@ export function CompatPage() {
           <ListingCard listing={l} />
           <div className="grid gap-2">
             <h2 className="text-lg">Care needs</h2>
-            <dl className={kv}>
-              <dt>Temperature</dt>
-              <dd>
-                {s.temp[0]} to {s.temp[1]} °C
-              </dd>
-              <dt>pH</dt>
-              <dd>
-                {s.ph[0].toFixed(1)} to {s.ph[1].toFixed(1)}
-              </dd>
-              <dt>Minimum volume</dt>
-              <dd>{s.minVol} litres</dd>
-              <dt>Lives in</dt>
-              <dd>{s.habitats.map((x) => (x === 'pond' ? 'Pond' : 'Aquarium')).join(' or ')}</dd>
-              {s.minDepth && (
-                <>
-                  <dt>Minimum depth</dt>
-                  <dd>{s.minDepth} cm</dd>
-                </>
-              )}
-            </dl>
+            <CareList species={s} />
           </div>
         </aside>
       </div>

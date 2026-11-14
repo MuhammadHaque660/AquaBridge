@@ -19,7 +19,6 @@ export const REASON = {
   time: 'No longer have time',
   other: 'Something else',
 };
-export const GROUP_LABEL = { trop: 'Tropical', cold: 'Coldwater', plant: 'Aquarium plant', pond: 'Pond plant' };
 
 /** Sample users. ME is the signed-in sample account (Jordan Lee). */
 export const USERS = {

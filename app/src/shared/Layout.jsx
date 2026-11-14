@@ -12,12 +12,12 @@ import { Toast } from './components/Feedback';
 import { cx, wrap } from './styles';
 
 const NAV_LINK =
-  'relative flex min-h-16 items-center px-3 text-md font-semibold text-ink no-underline hover:text-primary hover:underline ' +
+  'relative flex min-h-16 items-center px-3 text-md font-semibold whitespace-nowrap text-ink no-underline hover:text-primary hover:underline ' +
   "aria-[current=page]:text-primary aria-[current=page]:after:absolute aria-[current=page]:after:inset-x-3 aria-[current=page]:after:bottom-0 aria-[current=page]:after:h-1 aria-[current=page]:after:bg-primary aria-[current=page]:after:content-[''] " +
-  'max-lg:min-h-12 max-lg:px-0 max-lg:aria-[current=page]:after:hidden max-lg:aria-[current=page]:underline';
+  'max-xl:min-h-12 max-xl:px-0 max-xl:aria-[current=page]:after:hidden max-xl:aria-[current=page]:underline';
 const DD_ITEM =
   'flex w-full items-center justify-between gap-3 rounded-ab-sm px-3 py-2.5 text-left text-md text-ink no-underline hover:bg-mist hover:text-ink ' +
-  'aria-[current=page]:font-semibold aria-[current=page]:text-primary max-lg:px-0';
+  'aria-[current=page]:font-semibold aria-[current=page]:text-primary max-xl:px-0';
 const BADGE = 'min-w-6 rounded-full bg-bad px-1.5 text-center text-xs leading-6 font-bold text-white tabular-nums';
 
 /** Header (SH-04): logo, three main links, and an account menu grouped into Rehoming and Adopting. */
@@ -64,6 +64,7 @@ function Header() {
   const current = (n) =>
     name === n ||
     (n === 'browse' && ['listing', 'compat', 'request', 'sent'].includes(name)) ||
+    (n === 'species' && name === 'speciesDetail') ||
     (n === 'rehome' && ['review', 'guidance', 'editor'].includes(name))
       ? 'page'
       : undefined;
@@ -104,22 +105,25 @@ function Header() {
           aria-label="Main"
           className={cx(
             'flex flex-1 items-center gap-2',
-            'max-lg:border-line max-lg:bg-surface max-lg:shadow-card max-lg:absolute max-lg:inset-x-0 max-lg:top-full max-lg:flex-col max-lg:items-stretch max-lg:gap-0 max-lg:border-b max-lg:px-6 max-lg:pb-4',
-            !navOpen && 'max-lg:hidden',
+            'max-xl:border-line max-xl:bg-surface max-xl:shadow-card max-xl:absolute max-xl:inset-x-0 max-xl:top-full max-xl:flex-col max-xl:items-stretch max-xl:gap-0 max-xl:border-b max-xl:px-6 max-xl:pb-4',
+            !navOpen && 'max-xl:hidden',
           )}
         >
-          <div className="flex items-center max-lg:flex-col max-lg:items-stretch">
+          <div className="flex items-center max-xl:flex-col max-xl:items-stretch">
             <Link to="/browse" className={NAV_LINK} aria-current={current('browse')}>
               Browse listings
             </Link>
             <Link to="/rehome" className={NAV_LINK} aria-current={current('rehome')}>
               Rehome
             </Link>
+            <Link to="/species" className={NAV_LINK} aria-current={current('species')}>
+              Species guide
+            </Link>
             <Link to="/how-it-works" className={NAV_LINK} aria-current={current('help')}>
               How it works
             </Link>
           </div>
-          <div className="max-lg:border-line ml-auto flex items-center gap-4 max-lg:ml-0 max-lg:flex-col max-lg:items-stretch max-lg:gap-0 max-lg:border-t max-lg:pt-2">
+          <div className="max-xl:border-line ml-auto flex items-center gap-4 max-xl:ml-0 max-xl:flex-col max-xl:items-stretch max-xl:gap-0 max-xl:border-t max-xl:pt-2">
             {user ? (
               <div className="relative" ref={ddRef}>
                 <button
@@ -128,7 +132,7 @@ function Header() {
                   onClick={toggleAcct}
                   aria-expanded={acctOpen}
                   aria-controls="acctPanel"
-                  className="group rounded-ab-sm text-md text-ink hover:bg-mist flex min-h-11 items-center gap-2 px-2 font-semibold max-lg:hidden"
+                  className="group rounded-ab-sm text-md text-ink hover:bg-mist flex min-h-11 items-center gap-2 px-2 font-semibold max-xl:hidden"
                 >
                   <span>Your account</span>
                   {pendingCount ? (
@@ -142,17 +146,17 @@ function Header() {
                   id="acctPanel"
                   className={cx(
                     'rounded-ab border-line bg-surface shadow-card absolute top-[calc(100%+8px)] right-0 z-30 w-72 border p-2',
-                    'max-lg:static max-lg:grid max-lg:w-auto max-lg:border-0 max-lg:p-0 max-lg:shadow-none',
+                    'max-xl:static max-xl:grid max-xl:w-auto max-xl:border-0 max-xl:p-0 max-xl:shadow-none',
                     acctOpen ? 'grid' : 'hidden',
                   )}
                 >
-                  <p className="text-ink-2 px-3 pt-2 pb-2 text-sm max-lg:px-0">
+                  <p className="text-ink-2 px-3 pt-2 pb-2 text-sm max-xl:px-0">
                     Signed in as <strong className="text-ink">{user.name}</strong>
                   </p>
-                  <p className="text-ink-2 px-3 pt-2 text-xs font-semibold max-lg:px-0">Rehoming</p>
+                  <p className="text-ink-2 px-3 pt-2 text-xs font-semibold max-xl:px-0">Rehoming</p>
                   {ddLink('mylistings', 'My listings')}
                   {ddLink('incoming', 'Requests for my listings', pendingCount)}
-                  <p className="border-line text-ink-2 mt-2 border-t px-3 pt-3 text-xs font-semibold max-lg:px-0">
+                  <p className="border-line text-ink-2 mt-2 border-t px-3 pt-3 text-xs font-semibold max-xl:px-0">
                     Adopting
                   </p>
                   {ddLink('habitat', 'My tanks and ponds')}
@@ -172,7 +176,7 @@ function Header() {
                 <Link
                   to="/signin?tab=register"
                   onClick={clearPending}
-                  className="rounded-ab-sm bg-primary hover:bg-primary-hover inline-flex min-h-11 items-center justify-center px-4 font-semibold text-white no-underline hover:text-white max-lg:my-2"
+                  className="rounded-ab-sm bg-primary hover:bg-primary-hover inline-flex min-h-11 items-center justify-center px-4 font-semibold text-white no-underline hover:text-white max-xl:my-2"
                 >
                   Create an account
                 </Link>
@@ -180,7 +184,7 @@ function Header() {
             )}
           </div>
         </nav>
-        <div className="ml-auto lg:hidden">
+        <div className="ml-auto xl:hidden">
           <button
             ref={menuBtn}
             type="button"
@@ -320,6 +324,7 @@ function Footer() {
         {group('Using AquaBridge', [
           ['Browse listings', '/browse'],
           ['Rehome an animal or plant', '/rehome'],
+          ['Species guide', '/species'],
           ['How it works', '/how-it-works'],
           ['Never release them', '/how-it-works#never-release'],
           ['Accessibility', '/accessibility'],

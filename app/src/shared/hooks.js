@@ -18,10 +18,3 @@ export function useGo() {
     [navigate],
   );
 }
-
-/** Focus the first field with an error after a failed submit. */
-export function focusFirstError() {
-  requestAnimationFrame(() =>
-    document.querySelector('.has-error input, .has-error select, .has-error textarea')?.focus(),
-  );
-}

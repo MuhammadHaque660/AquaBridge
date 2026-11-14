@@ -242,6 +242,34 @@ export const SCREENS = {
     ],
     components: ['Tag', 'Handover progress', 'Inline confirmation', 'Notice'],
   },
+  species: {
+    area: 'public',
+    purpose:
+      'A searchable list of every species AquaBridge supports, plus the restricted ones, so people can read care needs before they rehome or adopt.',
+    onScreen: [
+      'Search by common or scientific name',
+      'Animal or plant filter with counts',
+      'One card per species: illustration, name, scientific name, habitat or a “Restricted” tag',
+      'No-results state',
+    ],
+    components: ['Species illustration', 'Radio list', 'Tag', 'Empty state'],
+  },
+  speciesDetail: {
+    area: 'public',
+    purpose:
+      'Everything about one species: care needs with units, and either live listings for it or, if restricted, why it cannot be listed and what to do instead.',
+    onScreen: [
+      'Back link to all species',
+      'Name, scientific name and a “Restricted” tag when it applies',
+      'Illustration',
+      'Care text and care needs summary list',
+      'Restricted: warning and what to do instead',
+      '“Have one to rehome?” box',
+      'Live listings for this species',
+    ],
+    components: ['Species illustration', 'Summary list', 'Warning text', 'Notice', 'Listing card'],
+    example: { id: 'SP-002' },
+  },
   help: {
     area: 'content',
     purpose: 'Explains both journeys in more detail, what to do instead of releasing, and why it matters (SDG 14).',

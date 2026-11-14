@@ -1,5 +1,8 @@
+import { Link } from 'react-router';
+import { to } from '../../routes';
 import { Notice } from '../../shared/components/Feedback';
-import { cx, kv, panel } from '../../shared/styles';
+import { cx, panel } from '../../shared/styles';
+import { CareList } from './CareList';
 import { SPECIES } from '../../services/species';
 
 /** Species care reference (F-05) shown beside the questionnaire, review, guidance and editor. */
@@ -14,22 +17,7 @@ export function CareWidget({ speciesId }) {
           <i>{s.sci}</i>
         </p>
       </div>
-      {s.temp && (
-        <dl className={kv}>
-          <dt>Temperature</dt>
-          <dd>
-            {s.temp[0]} to {s.temp[1]} °C
-          </dd>
-          <dt>pH</dt>
-          <dd>
-            {s.ph[0].toFixed(1)} to {s.ph[1].toFixed(1)}
-          </dd>
-          <dt>Minimum volume</dt>
-          <dd>{s.minVol} litres</dd>
-          <dt>Lives in</dt>
-          <dd className="capitalize">{s.habitats.join(' or ')}</dd>
-        </dl>
-      )}
+      <CareList species={s} full={false} />
       {s.status !== 'supported' && (
         <Notice
           tone={s.status === 'restricted' ? 'bad' : 'warn'}
@@ -37,6 +25,9 @@ export function CareWidget({ speciesId }) {
         />
       )}
       <p className="text-sm">{s.care}</p>
+      <p className="text-xs">
+        <Link to={to('speciesDetail', { id: speciesId })}>Read the full {s.common.toLowerCase()} guide</Link>
+      </p>
       <p className="text-ink-2 text-xs">Sample reference data, not checked by a specialist.</p>
     </section>
   );

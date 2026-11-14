@@ -112,15 +112,15 @@ flowchart LR
 | Language | **JavaScript** | Shared data shapes are documented with JSDoc in `src/services/contracts.js` |
 | Styling | **Tailwind CSS v4** | Design tokens live in `@theme` in `src/index.css` (`bg-primary`, `text-ink-2`, `rounded-ab` …) |
 | Routing | **React Router** | Real URLs per screen; signed-out users are sent to login and back (`RequireAuth`) |
-| State | React context + `localStorage` | `src/services/store.jsx`: `update(s => …)` changes a copy, saves and re-renders |
-| Tests | **Vitest + React Testing Library** | `npm test` |
+| State | React context + `localStorage` | `src/services/store.jsx`: `update(s => …)` changes a copy, saves and re-renders. Saved data is versioned (`DATA_VERSION`): bump it when the sample data changes |
+| Tests | **Vitest + React Testing Library + axe-core** | `npm test` runs unit, journey and automated accessibility tests |
 | Quality | ESLint + Prettier (with the Tailwind class sorter) | `npm run lint` · `npm run format` |
 
 ```bash
 cd app
 npm install      # first time only
 npm run dev      # http://localhost:5173
-npm test         # 19 tests: request service, guidance and compatibility rules, routing
+npm test         # 52 tests: rules, request service, sign-in, journeys, accessibility (axe-core) on 26 pages
 npm run lint
 npm run build    # production build into app/dist
 ```
@@ -150,6 +150,8 @@ app/src/
 - **Change state only through `update()` or `run()`** from `useStore()`, and request state only through `services/requestService.js`.
 - **Read species only through `getSpecies` / `listSpecies`** (`services/species.js`).
 - Work mostly inside your own `features/` folder to avoid merge conflicts.
+- Link with `<Link to>` or `Button to`, never a raw `href="/…"`: the live site runs under `/prototype/`, and router links add that automatically.
+- A crash on one screen shows a friendly error page (`shared/ErrorBoundary.jsx`) instead of a blank page.
 
 ---
 
@@ -159,7 +161,7 @@ app/src/
 
 | Area | Screens | Login needed |
 |---|---|---|
-| **Public** | Homepage · Browse listings · Listing details · Guided questionnaire · Review answers · Guidance outcome | No |
+| **Public** | Homepage · Browse listings · Listing details · Species guide · Rehoming questions · Check your answers · Guidance | No |
 | **Rehoming** (account menu) | My Listings · Listing editor · Incoming requests | Yes |
 | **Adopting** (account menu) | My Habitat · Compatibility check · Request adoption · My Requests | Yes |
 | **Team tools** (footer) | Demo flows · Screen map · Design system | No |
@@ -191,7 +193,7 @@ app/src/
 
 ## Demo flows
 
-Open **Demo flows** from the prototype footer (or `/prototype/team/demos`). Each flow starts from fresh sample data. A guide panel says **who is acting**, **what they do**, **what the system does** and **who builds it**. Press **Next step** and the prototype performs the action and highlights it. **Back** works at every step.
+Open **Demo flows** from the prototype footer (or `/prototype/team/demos`). Each flow starts from fresh sample data. A guide panel says **who is acting**, **what they do**, **what the system does** and **who builds it**. Press **Next step** and the prototype performs the action and highlights it. **Back** works at every step. Every screen page in the team reference has **Play from here** buttons that start a flow at that screen.
 
 ### Flow 1 · Owner · Rehome six neon tetras (11 steps)
 
@@ -264,7 +266,7 @@ Someone new to AquaBridge creates an account at the compatibility check, adds th
 | 9 | Request sent | New adopter, signed in | Midhir · M-06 |
 | 10 | The tank is saved for next time | New adopter, signed in | Midhir · M-02 |
 
-### Flow 5 · Owner · Restricted species and animals that need checking (6 steps)
+### Flow 5 · Owner · Restricted species and animals that need checking (7 steps)
 
 What an owner sees when a listing is not allowed: a restricted species, then an animal that is unwell. Both get clear next steps instead of an error.
 
@@ -273,9 +275,10 @@ What an owner sees when a listing is not allowed: a restricted species, then an 
 | 1 | A restricted species | Owner, signed out | Farhan · F-02, F-05 |
 | 2 | It can’t be listed | Owner, signed out | Farhan · F-04 |
 | 3 | What to do instead | Owner, signed out | Farhan · F-04, GUID-006 |
-| 4 | An animal that is unwell | Owner, signed out | Farhan · F-02 |
-| 5 | Needs checking first | Owner, signed out | Farhan · F-04, GUID-005 |
-| 6 | Never release them | Anyone | Shared · SDG 14 |
+| 4 | Look it up in the species guide | Owner, signed out | Farhan · F-08 |
+| 5 | An animal that is unwell | Owner, signed out | Farhan · F-02 |
+| 6 | Needs checking first | Owner, signed out | Farhan · F-04, GUID-005 |
+| 7 | Never release them | Anyone | Shared · SDG 14 |
 
 ---
 

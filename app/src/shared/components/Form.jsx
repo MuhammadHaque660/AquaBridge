@@ -168,28 +168,6 @@ export function RadioList({ name, legend, value, onChange, options }) {
   );
 }
 
-/** Segmented control (kept for compact toggles). options: [[value, label], …] */
-export function Segmented({ value, onChange, options }) {
-  return (
-    <div className="rounded-ab-sm border-line-strong bg-surface inline-flex overflow-hidden border">
-      {options.map(([v, l], i) => (
-        <button
-          key={v}
-          type="button"
-          aria-pressed={value === v}
-          onClick={() => onChange(v)}
-          className={cx(
-            'text-ink aria-pressed:bg-ink min-h-11 px-4 text-sm aria-pressed:font-semibold aria-pressed:text-white',
-            i > 0 && 'border-line-strong border-l',
-          )}
-        >
-          {l}
-        </button>
-      ))}
-    </div>
-  );
-}
-
 /** Underlined tabs. tabs: [[value, label, count?], …] */
 export function Tabs({ value, onChange, tabs }) {
   return (

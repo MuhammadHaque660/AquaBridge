@@ -10,15 +10,24 @@
 import { createContext, useCallback, useContext, useMemo, useRef, useState } from 'react';
 import { seed } from './seed';
 
-const KEY = 'aquabridge-app-v1';
+/**
+ * Saved sample data is versioned. Bump DATA_VERSION whenever seed.js or a data shape changes: browsers holding an older
+ * copy then start again from the new sample data instead of breaking on stale records.
+ */
+export const DATA_VERSION = 3;
+const KEY = 'aquabridge-app';
+const OLD_KEYS = ['aquabridge-app-v1', 'aquabridge-prototype-v1'];
 const StoreContext = createContext(null);
 
 function load() {
   try {
-    return JSON.parse(localStorage.getItem(KEY)) || seed();
+    OLD_KEYS.forEach((k) => localStorage.removeItem(k));
+    const saved = JSON.parse(localStorage.getItem(KEY));
+    if (saved?.version === DATA_VERSION && Array.isArray(saved.listings)) return saved;
   } catch {
-    return seed();
+    /* unreadable: fall through to fresh sample data */
   }
+  return { ...seed(), version: DATA_VERSION };
 }
 function persist(s) {
   try {
@@ -36,7 +45,7 @@ export function StoreProvider({ children, initial }) {
 
   /** Swap the whole state, e.g. after a reset. Pass a value, or a function of the current state. */
   const replace = useCallback((v) => {
-    const next = typeof v === 'function' ? v(ref.current) : v;
+    const next = { ...(typeof v === 'function' ? v(ref.current) : v), version: DATA_VERSION };
     ref.current = next;
     persist(next);
     setState(next);
