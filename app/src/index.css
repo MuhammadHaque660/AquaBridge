@@ -1,9 +1,9 @@
 @import 'tailwindcss';
 
 /*
-  Coastal Trust design tokens (light only).
+  AquaBridge design tokens (light only).
   Every colour, font, size and radius used in the app comes from here, so use these utilities
-  (bg-primary, text-ink-2, rounded-ab, font-display …) and never raw hex values or Tailwind's default palette.
+  (bg-primary, text-ink-2, rounded-ab …) and never raw hex values or Tailwind's default palette.
 */
 @theme {
   --color-*: initial;
@@ -11,46 +11,50 @@
   --color-black: #000000;
   --color-transparent: transparent;
   --color-current: currentColor;
-  --color-mist: #f4f8f7; /* Coastal Mist: page ground */
-  --color-surface: #ffffff; /* Cards, forms, panels */
-  --color-surface-2: #eaf3f0; /* Quiet fills, table heads, build-notes strip */
-  --color-line: #d3e3de; /* Shoreline: borders and dividers */
-  --color-ink: #12324a; /* Deep Ocean: headings and body text */
-  --color-ink-2: #4e6677; /* Tide Grey: secondary text */
-  --color-primary: #0b7a6e; /* Ocean Teal: primary actions, links */
-  --color-primary-hover: #08635a;
-  --color-primary-soft: #ddf3ec; /* Seafoam tint: selected states, info panels */
-  --color-weed: #5cc4a6; /* Seafoam: logo wave and small highlights */
+  --color-mist: #f5f7f7; /* Page sections and quiet fills */
+  --color-surface: #ffffff; /* Page background, cards, forms */
+  --color-surface-2: #eef2f2; /* Table heads, secondary buttons, insets */
+  --color-line: #d4dcdc; /* Borders and dividers */
+  --color-line-strong: #8a9a9e; /* Form field borders: 3:1 contrast */
+  --color-ink: #13293d; /* Headings and body text */
+  --color-ink-2: #4b5f6b; /* Secondary text and hints */
+  --color-primary: #0a6b60; /* The one accent: primary buttons and links */
+  --color-primary-hover: #075249;
+  --color-primary-soft: #e3f1ee; /* Selected rows and the info inset */
+  --color-weed: #5cc4a6; /* Logo wave only */
   --color-weed-soft: #c9efe2;
-  --color-ok: #1f7a4d; /* Match */
-  --color-ok-soft: #ddf1e5;
-  --color-warn: #965a00; /* Caution */
-  --color-warn-soft: #fcefd5;
-  --color-bad: #b4352c; /* Stop */
-  --color-bad-soft: #fbe3e0;
-  --color-mute-soft: #e6eeec;
+  --color-ok: #1d6e46;
+  --color-ok-soft: #dcefe3;
+  --color-warn: #8a5300;
+  --color-warn-soft: #fbedd2;
+  --color-bad: #b02a22;
+  --color-bad-soft: #fae1de;
+  --color-mute-soft: #e9eeee;
   --color-plate-trop: #d6efe9;
   --color-plate-cold: #dee8f2;
   --color-plate-plant: #e0efd9;
   --color-plate-pond: #edebd5;
 
-  --font-display: 'Familjen Grotesk', 'Segoe UI', system-ui, sans-serif;
-  --font-body: 'Atkinson Hyperlegible', 'Segoe UI', system-ui, sans-serif;
-  --font-mono: 'IBM Plex Mono', ui-monospace, Consolas, monospace;
+  /* One typeface for everything. Numbers use tabular figures where they line up in tables. */
+  --font-display: 'Atkinson Hyperlegible Next', 'Segoe UI', system-ui, sans-serif;
+  --font-body: 'Atkinson Hyperlegible Next', 'Segoe UI', system-ui, sans-serif;
+  --font-mono: 'Atkinson Hyperlegible Next', 'Segoe UI', system-ui, sans-serif;
+  --font-code: ui-monospace, Consolas, monospace; /* Only for code in the team tools */
 
-  /* Type scale: 13 · 15 · 16 · 20 · 26 · 34 · 52 px. Sizes inherit line-height from their parent. */
+  /* Type scale (px): 14 · 16 · 18 · 22 · 28 · 36 · 48. Sizes inherit line-height from their parent. */
   --text-*: initial;
-  --text-xs: 0.8125rem;
-  --text-sm: 0.9375rem;
-  --text-md: 1rem;
-  --text-lg: 1.25rem;
-  --text-xl: 1.625rem;
-  --text-2xl: 2.125rem;
-  --text-3xl: clamp(2.25rem, 5vw, 3.25rem);
+  --text-xs: 0.875rem;
+  --text-sm: 1rem;
+  --text-md: 1.125rem;
+  --text-lg: 1.375rem;
+  --text-xl: 1.75rem;
+  --text-2xl: 2.25rem;
+  --text-3xl: clamp(2.25rem, 4.5vw, 3rem);
 
-  --radius-ab: 6px;
-  --radius-ab-sm: 3px;
-  --container-page: 1180px;
+  --radius-ab: 8px; /* Cards, images, panels */
+  --radius-ab-sm: 4px; /* Buttons, inputs, tags */
+  --container-page: 1200px;
+  --shadow-card: 0 1px 2px rgb(19 41 61 / 0.06), 0 2px 8px rgb(19 41 61 / 0.06);
 
   /* Breakpoints: sm 640px · md 760px · lg 900px (two-pane layouts and the desktop menu start at lg) */
   --breakpoint-*: initial;
@@ -62,13 +66,19 @@
 @layer base {
   html {
     color-scheme: light;
+    scroll-behavior: smooth;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
   }
   body {
-    background: var(--color-mist);
+    background: var(--color-surface);
     color: var(--color-ink);
     font-family: var(--font-body);
-    font-size: 1rem;
-    line-height: 1.55;
+    font-size: 1.0625rem;
+    line-height: 1.5;
     -webkit-font-smoothing: antialiased;
   }
   h1,
@@ -76,44 +86,50 @@
   h3,
   h4 {
     font-family: var(--font-display);
-    line-height: 1.15;
+    line-height: 1.2;
     text-wrap: balance;
-    letter-spacing: -0.01em;
+    letter-spacing: -0.005em;
   }
   h1 {
     font-size: var(--text-2xl);
     font-weight: 700;
+    line-height: 1.12;
   }
   h2 {
     font-size: var(--text-xl);
-    font-weight: 650;
+    font-weight: 700;
   }
   h3 {
     font-size: var(--text-lg);
     font-weight: 600;
   }
+  p {
+    text-wrap: pretty;
+  }
   a {
     color: var(--color-primary);
     text-decoration: underline;
+    text-decoration-thickness: 1px;
     text-underline-offset: 3px;
   }
   a:hover {
     color: var(--color-primary-hover);
+    text-decoration-thickness: 2px;
   }
   :focus-visible {
-    outline: 3px solid var(--color-primary);
+    outline: 3px solid var(--color-ink);
     outline-offset: 2px;
-    border-radius: 2px;
   }
-  input:is([type='text'], [type='email'], [type='password'], [type='number']),
+  input:is([type='text'], [type='email'], [type='password'], [type='number'], [type='search']),
   select,
   textarea {
     font: inherit;
     color: var(--color-ink);
     background: var(--color-surface);
-    border: 1px solid var(--color-line);
+    border: 1px solid var(--color-line-strong);
     border-radius: var(--radius-ab-sm);
-    padding: 10px 12px;
+    padding: 9px 12px;
+    min-height: 44px;
     width: 100%;
     min-width: 0;
   }
@@ -122,12 +138,20 @@
   textarea:hover {
     border-color: var(--color-ink-2);
   }
+  input:focus-visible,
+  select:focus-visible,
+  textarea:focus-visible {
+    outline-offset: 0;
+  }
   textarea {
-    min-height: 112px;
+    min-height: 120px;
     resize: vertical;
   }
   button {
     cursor: pointer;
+  }
+  ::selection {
+    background: var(--color-primary-soft);
   }
 }
 
@@ -139,88 +163,6 @@
   .has-error :is(input, select, textarea) {
     border-color: var(--color-bad);
     box-shadow: 0 0 0 1px var(--color-bad);
-  }
-
-  .steps {
-    display: grid;
-    counter-reset: s;
-  }
-  .steps > li {
-    counter-increment: s;
-    display: grid;
-    grid-template-columns: 36px 1fr;
-    gap: 12px;
-    padding: 12px 0;
-    border-top: 1px solid var(--color-line);
-  }
-  .steps > li::before {
-    content: counter(s);
-    font-family: var(--font-mono);
-    font-size: var(--text-sm);
-    color: var(--color-primary);
-    padding-top: 1px;
-  }
-
-  .track {
-    display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-  }
-  .track > li {
-    position: relative;
-    display: grid;
-    gap: 6px;
-    padding-top: 22px;
-    font-size: var(--text-xs);
-    color: var(--color-ink-2);
-  }
-  .track > li::before {
-    content: '';
-    position: absolute;
-    top: 5px;
-    left: 0;
-    right: 0;
-    height: 2px;
-    background: var(--color-line);
-  }
-  .track > li::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 12px;
-    height: 12px;
-    border-radius: 50%;
-    background: var(--color-surface);
-    border: 2px solid var(--color-line);
-  }
-  .track > li.done {
-    color: var(--color-ink);
-  }
-  .track > li.done::before {
-    background: var(--color-primary);
-  }
-  .track > li.done::after {
-    background: var(--color-primary);
-    border-color: var(--color-primary);
-  }
-  .track > li.now {
-    color: var(--color-ink);
-    font-weight: 700;
-  }
-  .track > li.now::after {
-    border-color: var(--color-primary);
-  }
-  @media (max-width: 520px) {
-    .track {
-      grid-template-columns: 1fr;
-      gap: 8px;
-    }
-    .track > li {
-      padding: 0 0 0 24px;
-    }
-    .track > li::before {
-      display: none;
-    }
   }
 
   @media (prefers-reduced-motion: no-preference) {

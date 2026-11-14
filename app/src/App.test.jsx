@@ -21,16 +21,16 @@ const renderAt = (path, state = seed()) =>
 describe('App', () => {
   it('browse shows only active listings and filters them', async () => {
     renderAt('/browse');
-    expect(screen.getByText('6 of 6 listings')).toBeInTheDocument();
-    await userEvent.click(screen.getByRole('button', { name: 'Plants' }));
+    expect(screen.getByText('6 listings')).toBeInTheDocument();
+    await userEvent.click(screen.getAllByRole('radio', { name: /^Plants/ })[0]);
     expect(screen.getByText('3 of 6 listings')).toBeInTheDocument();
   });
 
   it('guarded pages send signed-out users to login, then back', async () => {
     renderAt('/account/requests');
-    expect(await screen.findByRole('heading', { name: 'Log in to continue' })).toBeInTheDocument();
-    expect(screen.getByText('You’ll go back to: My Requests')).toBeInTheDocument();
-    await userEvent.click(screen.getByRole('button', { name: 'Log in as sample user' }));
-    expect(await screen.findByRole('heading', { name: 'My Requests' })).toBeInTheDocument();
+    expect(await screen.findByRole('heading', { name: 'Sign in' })).toBeInTheDocument();
+    expect(screen.getByText('You’ll go back to: My adoption requests')).toBeInTheDocument();
+    await userEvent.click(screen.getByRole('button', { name: 'Sign in as the sample user' }));
+    expect(await screen.findByRole('heading', { name: 'My adoption requests' })).toBeInTheDocument();
   });
 });

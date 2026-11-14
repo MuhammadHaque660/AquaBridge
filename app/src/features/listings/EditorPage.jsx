@@ -2,16 +2,19 @@ import { useState } from 'react';
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router';
 import { CONDITION, REASON, URGENCY } from '../../services/contracts';
 import { byId, freshIntake, today } from '../../services/seed';
-import { SPECIES, supportedSpecies } from '../../services/species';
+import { SPECIES, suggestTitle, supportedSpecies } from '../../services/species';
 import { useStore } from '../../services/store';
 import { Button } from '../../shared/components/Button';
 import { Empty, Notice, PageHead } from '../../shared/components/Feedback';
-import { Field } from '../../shared/components/Form';
-import { focusFirstError, useUi } from '../../shared/hooks';
-import { cx, formFoot, formGrid, label, mono, page, panel, stack, sticky, twoPane } from '../../shared/styles';
+import { ErrorSummary, Field } from '../../shared/components/Form';
+import { useUi } from '../../shared/hooks';
+import { cx, formFoot, formGrid, label, page, stack, sticky, twoPane } from '../../shared/styles';
 import { CareWidget } from '../guidance/CareWidget';
 import { ListingCard } from './ListingCard';
 import { validateListing } from './validate';
+
+/** Error keys map to these field IDs so the error summary links focus the right control. */
+const FIELD_IDS = { title: 'title', qty: 'qty', location: 'loc', description: 'desc' };
 
 /** A new listing, pre-filled from the guided questions when they were completed (F-06 → S-01). */
 function draftFromIntake(intake, user, fromIntake) {
@@ -21,7 +24,7 @@ function draftFromIntake(intake, user, fromIntake) {
     id: null,
     owner: user,
     speciesId: a.speciesId || 'SP-001',
-    title: fromIntake ? `${a.quantity} ${s.common?.toLowerCase()} need a new home` : '',
+    title: fromIntake && s.common ? suggestTitle(s, a.quantity) : '',
     qty: +a.quantity || 1,
     location: a.location || '',
     condition: a.condition || 'healthy',
@@ -55,9 +58,9 @@ export function EditorPage() {
   if (id && !existing)
     return (
       <div className={page}>
-        <Empty title="That listing could not be found.">
+        <Empty title="We could not find that listing.">
           <Button to="/account/listings" variant="secondary">
-            Back to My Listings
+            Go to my listings
           </Button>
         </Empty>
       </div>
@@ -68,7 +71,7 @@ export function EditorPage() {
     const e =
       status === 'active' ? validateListing(d) : !d.title?.trim() ? { title: 'Add a title to save a draft.' } : {};
     setErrors(e);
-    if (Object.keys(e).length) return focusFirstError();
+    if (Object.keys(e).length) return;
     const wasActive = d.status === 'active';
     update((s) => {
       const clean = { ...d, title: d.title.trim(), location: d.location.trim(), description: d.description.trim() };
@@ -78,39 +81,52 @@ export function EditorPage() {
       if (clean.intakeId) s.intake = freshIntake();
     });
     navigate('/account/listings');
-    toast(status === 'active' ? (wasActive ? 'Changes saved' : 'Published. It now appears in Browse.') : 'Draft saved');
+    toast(
+      status === 'active'
+        ? wasActive
+          ? 'Your changes have been saved'
+          : 'Your listing is live. It now appears in Browse listings.'
+        : 'Draft saved',
+    );
   };
-  const errorCount = Object.keys(errors).length;
 
   return (
     <div className={page}>
       <PageHead
-        title={d.id ? 'Edit listing' : 'Create your listing'}
-        crumb={<Link to="/account/listings">← My Listings</Link>}
+        title={d.id ? 'Edit your listing' : 'Create your listing'}
+        crumb={<Link to="/account/listings">← Back to my listings</Link>}
       >
-        {d.intakeId && (
-          <Notice tone="ok" title="Filled in from your rehoming answers" data-tour="prefill">
-            Species, quantity, condition, location and timing came from intake{' '}
-            <span className={mono}>{d.intakeId}</span>. Check them and add a description.
+        {d.intakeId ? (
+          <Notice
+            tone="ok"
+            title="We have filled this in from your answers"
+            data-tour="prefill"
+            className="max-w-[60ch]"
+          >
+            The species, how many, condition, location and timing come from the rehoming questions. Check them, then add
+            a title and description.
           </Notice>
+        ) : (
+          <p className="text-md text-ink-2 max-w-[60ch]">
+            Adopters see this information before they ask. Only your town and postcode district are shown.
+          </p>
         )}
       </PageHead>
       <div className={twoPane}>
         <form
-          className={cx(panel, stack)}
           noValidate
           onSubmit={(e) => {
             e.preventDefault();
             save('active');
           }}
         >
+          <ErrorSummary errors={errors} ids={FIELD_IDS} />
           <div className={formGrid}>
             <Field
               id="title"
               label="Title"
-              required
               full
-              hint="10–80 characters. Say what it is and how many."
+              hint="Say what it is and how many, for example “Six neon tetras”. 10 to 80 characters."
               error={errors.title}
             >
               <input type="text" id="title" value={d.title} maxLength={80} onChange={set('title')} />
@@ -118,7 +134,11 @@ export function EditorPage() {
             <Field
               id="speciesId2"
               label="Species"
-              hint={d.intakeId ? 'Locked to the species checked in your guidance.' : undefined}
+              hint={
+                d.intakeId
+                  ? 'This is the species you were given guidance for, so it cannot be changed here.'
+                  : undefined
+              }
             >
               <select id="speciesId2" value={d.speciesId} onChange={set('speciesId')} disabled={!!d.intakeId}>
                 {supportedSpecies().map((x) => (
@@ -128,10 +148,23 @@ export function EditorPage() {
                 ))}
               </select>
             </Field>
-            <Field id="qty" label="Quantity" required error={errors.qty}>
-              <input type="number" id="qty" min="1" value={d.qty} onChange={set('qty')} />
+            <Field id="qty" label="How many" error={errors.qty}>
+              <input
+                type="number"
+                id="qty"
+                min="1"
+                inputMode="numeric"
+                className="max-w-32"
+                value={d.qty}
+                onChange={set('qty')}
+              />
             </Field>
-            <Field id="loc" label="Location" required error={errors.location}>
+            <Field
+              id="loc"
+              label="Town and postcode district"
+              hint="For example, Uxbridge, UB8"
+              error={errors.location}
+            >
               <input type="text" id="loc" value={d.location} onChange={set('location')} />
             </Field>
             <Field id="cond" label="Condition">
@@ -145,7 +178,7 @@ export function EditorPage() {
                   ))}
               </select>
             </Field>
-            <Field id="urg" label="Available">
+            <Field id="urg" label="When does it need a new home?">
               <select id="urg" value={d.urgency} onChange={set('urgency')}>
                 {Object.entries(URGENCY).map(([k, v]) => (
                   <option key={k} value={k}>
@@ -157,38 +190,25 @@ export function EditorPage() {
             <Field
               id="desc"
               label="Description"
-              required
               full
-              hint="At least 40 characters. Age, temperament and why you’re rehoming."
+              hint="Age, temperament and why you are rehoming. At least 40 characters."
               error={errors.description}
             >
               <textarea id="desc" value={d.description} onChange={set('description')} />
             </Field>
-            <Field id="care" label="Care notes" full>
-              <textarea
-                id="care"
-                value={d.careNotes}
-                onChange={set('careNotes')}
-                placeholder="Food, temperature, tank mates"
-              />
+            <Field id="care" label="Care notes" optional full hint="Food, temperature and tank mates.">
+              <textarea id="care" value={d.careNotes} onChange={set('careNotes')} />
             </Field>
           </div>
-          {errorCount > 0 && (
-            <Notice
-              tone="bad"
-              role="alert"
-              title={`Fix ${errorCount} thing${errorCount > 1 ? 's' : ''} before publishing`}
-            />
-          )}
-          <div className={cx(formFoot, 'mt-0')}>
+          <div className={formFoot}>
+            <Button type="submit">{d.status === 'active' ? 'Save changes' : 'Publish listing'}</Button>
             <Button variant="secondary" onClick={() => save('draft')}>
               Save as draft
             </Button>
-            <Button type="submit">{d.status === 'active' ? 'Save changes' : 'Publish listing'}</Button>
           </div>
         </form>
         <aside className={cx(stack, sticky)}>
-          <span className={label}>Preview · how adopters see it</span>
+          <h2 className={cx(label, 'text-sm')}>Preview: how adopters will see it</h2>
           <ListingCard listing={{ ...d, id: d.id || 'L-new' }} preview />
           <CareWidget speciesId={d.speciesId} />
         </aside>

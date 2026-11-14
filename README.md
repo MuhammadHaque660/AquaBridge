@@ -110,7 +110,7 @@ flowchart LR
 |---|---|---|
 | Framework | **React 19 + Vite** | `app/` · fast dev server, static build |
 | Language | **JavaScript** | Shared data shapes are documented with JSDoc in `src/services/contracts.js` |
-| Styling | **Tailwind CSS v4** | Coastal Trust tokens live in `@theme` in `src/index.css` (`bg-primary`, `text-ink-2`, `rounded-ab` …) |
+| Styling | **Tailwind CSS v4** | Design tokens live in `@theme` in `src/index.css` (`bg-primary`, `text-ink-2`, `rounded-ab` …) |
 | Routing | **React Router** | Real URLs per screen; signed-out users are sent to login and back (`RequireAuth`) |
 | State | React context + `localStorage` | `src/services/store.jsx`: `update(s => …)` changes a copy, saves and re-renders |
 | Tests | **Vitest + React Testing Library** | `npm test` |
@@ -129,7 +129,7 @@ npm run build    # production build into app/dist
 
 ```text
 app/src/
-├── index.css            Tailwind + Coastal Trust design tokens (the only place colours are defined)
+├── index.css            Tailwind + design tokens (the only place colours are defined)
 ├── routes.js            Every screen: URL, owner, Sprint 1 tasks and stories (drives the build notes and screen map)
 ├── App.jsx              Route table
 ├── shared/              Midhir · SH-02/SH-09 components (Button, Chip, Field, Notice, Plate, Tracker), Layout, hooks
@@ -243,69 +243,57 @@ Open **Demo flows** from the prototype footer (or `/prototype/demos`). Each flow
 
 ## Design system
 
-**Coastal Trust**: light, calm and trustworthy. Deep ocean navy for text, ocean teal for actions, seafoam tints for supporting panels, coastal mist for the background. Light theme only.
+Calm, plain and trustworthy, in the style of a public service rather than a startup landing page. One typeface, one accent colour, borders only where they separate something. See [`docs/design-audit.md`](docs/design-audit.md) for the audit behind it, and the live **Design system** page in the prototype footer.
 
 ### Colours
 
+Tokens live in `app/src/index.css` (`@theme`). Tailwind's default palette is switched off, so use these names.
+
 | | Name | Hex | Token | Use |
 |---|---|---|---|---|
-| <img src="docs/assets/swatches/deep-ocean.svg" width="72"> | Deep Ocean | `#12324A` | `--ink` | Headings, body text, SDG band |
-| <img src="docs/assets/swatches/ocean-teal.svg" width="72"> | Ocean Teal | `#0B7A6E` | `--primary` | Primary buttons, links, selected states |
-| <img src="docs/assets/swatches/seafoam.svg" width="72"> | Seafoam | `#5CC4A6` | `--weed` | Small highlights only (logo wave, markers) |
-| <img src="docs/assets/swatches/seafoam-tint.svg" width="72"> | Seafoam Tint | `#DDF3EC` | `--primary-soft` | Selected options, info panels |
-| <img src="docs/assets/swatches/coastal-mist.svg" width="72"> | Coastal Mist | `#F4F8F7` | `--bg` | Page background |
-| <img src="docs/assets/swatches/white.svg" width="72"> | White | `#FFFFFF` | `--surface` | Cards, forms, panels |
-| <img src="docs/assets/swatches/shoreline.svg" width="72"> | Shoreline | `#D3E3DE` | `--line` | Borders and dividers |
-| <img src="docs/assets/swatches/tide-grey.svg" width="72"> | Tide Grey | `#4E6677` | `--ink-2` | Secondary text, hints |
-
-**Status colours** are separate from the brand and always come with a text label.
-
-| | Name | Hex | Used for |
-|---|---|---|---|
-| <img src="docs/assets/swatches/match.svg" width="72"> | Match | `#1F7A4D` | `active`, `completed`, `potential_match`, `eligible` |
-| <img src="docs/assets/swatches/caution.svg" width="72"> | Caution | `#965A00` | `pending`, `reserved`, `needs_information`, `needs_review` |
-| <img src="docs/assets/swatches/stop.svg" width="72"> | Stop | `#B4352C` | `declined`, `blocked`, `restricted`, errors |
-
-**Specimen plates** (the coloured panel on each listing, coloured by habitat group):
-
-| <img src="docs/assets/swatches/plate-tropical.svg" width="72"> | <img src="docs/assets/swatches/plate-coldwater.svg" width="72"> | <img src="docs/assets/swatches/plate-plant.svg" width="72"> | <img src="docs/assets/swatches/plate-pond.svg" width="72"> |
-|:-:|:-:|:-:|:-:|
-| Tropical `#D6EFE9` | Coldwater `#DEE8F2` | Aquarium plant `#E0EFD9` | Pond plant `#EDEBD5` |
+| <img src="docs/assets/swatches/ink.svg" width="72"> | Ink | `#13293D` | `ink` | Headings and body text |
+| <img src="docs/assets/swatches/secondary-text.svg" width="72"> | Secondary text | `#4B5F6B` | `ink-2` | Hints, captions, metadata |
+| <img src="docs/assets/swatches/teal.svg" width="72"> | Teal | `#0A6B60` | `primary` | The one accent: primary buttons and links |
+| <img src="docs/assets/swatches/teal-tint.svg" width="72"> | Teal tint | `#E3F1EE` | `primary-soft` | Selected rows, information insets |
+| <img src="docs/assets/swatches/white.svg" width="72"> | White | `#FFFFFF` | `surface` | Page background |
+| <img src="docs/assets/swatches/mist.svg" width="72"> | Mist | `#F5F7F7` | `mist` | Section backgrounds and quiet panels |
+| <img src="docs/assets/swatches/line.svg" width="72"> | Line | `#D4DCDC` | `line` | Dividers and table rules |
+| <img src="docs/assets/swatches/field-border.svg" width="72"> | Field border | `#8A9A9E` | `line-strong` | Form fields (3:1 contrast) |
+| <img src="docs/assets/swatches/success.svg" width="72"> | Success | `#1D6E46` | `ok` | Live, completed, potential match |
+| <img src="docs/assets/swatches/caution.svg" width="72"> | Caution | `#8A5300` | `warn` | Waiting for owner, reserved, needs information |
+| <img src="docs/assets/swatches/error.svg" width="72"> | Error | `#B02A22` | `bad` | Errors, declined, not compatible, restricted |
 
 ### Type
 
-| Role | Font | Where |
-|---|---|---|
-| Display | **Familjen Grotesk** 500–700 | Headings, menu, card titles |
-| Body | **Atkinson Hyperlegible** 400 / 700 | All reading text and forms. Designed by the Braille Institute for low-vision readers |
-| Data | **IBM Plex Mono** 400 / 500 | IDs (`L-1045`), water readings (`20–26 °C`, `pH 6.0–7.0`, `≥ 54 L`), labels |
+**Atkinson Hyperlegible Next** for everything, weights 400 to 700. It was designed by the Braille Institute for readers with low vision. Hierarchy comes from size and weight only: no second display font, no monospace, no uppercase labels.
 
-Scale: `13 · 15 · 16 · 20 · 26 · 34 · 52 px` · Corners: `6px` · Spacing: `4 · 8 · 12 · 16 · 24 · 32 · 48 · 72 px`
+Scale: `14 · 16 · 18 · 22 · 28 · 36 · 48 px` · Body `17px / 1.5` · Corners `4px` (buttons, fields, tags) and `8px` (cards, images)
 
-### Components
+### Components (`app/src/shared`)
 
 | Component | Notes |
 |---|---|
-| Buttons | Primary (teal), secondary (white + border), quiet (text), danger (red outline). Say exactly what happens: *Publish listing*, *Send request* |
-| Status chip | One component for every contract status. Dot + text, never colour alone |
-| Choice card | Radio styled as a card, used in the questionnaire and habitat form |
-| Specimen plate | Scientific name in italic display type on a habitat-coloured panel, plus a fish or leaf line icon |
-| Parameter strip | Mono readout of temperature, pH and minimum volume (detail page only, not on cards) |
-| Range bar | Species range vs habitat value for temperature and pH on the compatibility page |
-| Handover tracker | Accepted → Owner confirmed → Adopter confirmed → Rehoming complete |
-| Toast and inline confirm | Short confirmations; destructive actions confirm inline, never with browser pop-ups |
+| Button | Primary (teal), secondary (grey), quiet (text link), danger (red). One primary per screen. Label says what happens: *Publish listing*, *Send request* |
+| Tag (`Chip`) | Rectangular, sentence case, people's wording ("Waiting for owner"), never clickable, never colour alone |
+| Field, Choice, Check | Label, hint, error, then the control. Required by default; optional fields say "(optional)". Large radios instead of choice cards |
+| Error summary | "There is a problem" box at the top after a failed submit; takes focus and links to each field |
+| Notice, Warning, Panel | Inset with a coloured left edge; "!" warning text; green confirmation panel with a reference |
+| Species illustrations | One per species, in the style of the homepage aquarium, used until owners can upload photos |
+| Summary list (`kv`) | Label/value rows with dividers for listing facts, habitats and care needs |
+| Handover progress | Vertical checklist: accepted → owner confirmed → adopter confirmed → complete |
+| Prototype banner | Says it is a prototype with sample data; "Team notes" shows the screen owner, tasks and stories |
 
 ### Rules we follow
 
 | ✅ Do | ❌ Don’t |
 |---|---|
-| Use the specimen plate for listings | Stock photos or AI-generated fish art |
-| Flat colour, one border style, 6px corners | Gradients, glows, heavy shadows |
-| Two line icons (fish, leaf) and text labels | Emoji as icons |
-| Real units in the mono face (°C, pH, L, cm) | Vanity stats or made-up numbers |
-| Left-aligned content | Centring everything |
-| Visible focus ring, 44px touch targets, one column under 900px | Hover-only interactions |
-| Short listing cards: plate, title, *Animal · Town*, date, one tag | Care ranges, quantity or IDs on cards |
+| Let headings do the work; use a caption only to show position ("Step 2 of 4") | Small uppercase labels above every heading |
+| Use people's words: tank, request to adopt, waiting for owner | Show record IDs (except a reference on a confirmation page) |
+| Group with space and quiet tints | Borders on every card, boxes inside boxes, hover lifts |
+| One primary button per screen | A filled button plus an outlined button everywhere |
+| Error summary plus a message by the field saying how to fix it | Red asterisks, "invalid", clearing what someone typed |
+| Tags with words | Coloured dots or colour alone |
+| Dark focus outline, 44px targets, one column under 900px | Hover-only controls |
 
 ---
 

@@ -6,19 +6,30 @@ import { byId } from '../../services/seed';
 import { speciesFor } from '../../services/species';
 import { useStore } from '../../services/store';
 import { Button } from '../../shared/components/Button';
-import { Chip } from '../../shared/components/Chip';
+import { Chip, statusLabel } from '../../shared/components/Chip';
 import { ConfirmInline, Empty, PageHead } from '../../shared/components/Feedback';
 import { Tabs } from '../../shared/components/Form';
 import { useGo, useUi } from '../../shared/hooks';
-import { cx, label, mono, page } from '../../shared/styles';
+import { page } from '../../shared/styles';
 import { validateListing } from './validate';
 
-export const tableWrap = 'overflow-x-auto rounded-ab border border-line bg-surface';
+export const tableWrap = 'overflow-x-auto';
 export const table =
-  'w-full min-w-[680px] border-collapse text-sm [&_td]:border-t [&_td]:border-line [&_td]:px-4 [&_td]:py-3 [&_td]:align-middle ' +
-  '[&_th]:bg-surface-2 [&_th]:px-4 [&_th]:py-2.5 [&_th]:text-left [&_th]:font-mono [&_th]:text-[0.6875rem] [&_th]:font-medium [&_th]:tracking-[.08em] [&_th]:text-ink-2 [&_th]:uppercase';
+  'w-full min-w-[680px] border-collapse text-sm [&_td]:border-b [&_td]:border-line [&_td]:px-3 [&_td]:py-3.5 [&_td]:align-middle [&_td:first-child]:pl-0 ' +
+  '[&_th]:border-b-2 [&_th]:border-ink [&_th]:px-3 [&_th]:py-2.5 [&_th]:text-left [&_th]:font-semibold [&_th]:text-ink [&_th:first-child]:pl-0';
 
-/** My Listings (S-04 manage, S-05 dashboard). Requires login. */
+const linkBtn = 'text-sm text-primary underline underline-offset-3 hover:text-primary-hover hover:decoration-2';
+
+const TAB_LABEL = {
+  all: 'All',
+  draft: 'Drafts',
+  active: 'Live',
+  reserved: 'Reserved',
+  rehomed: 'Rehomed',
+  withdrawn: 'Withdrawn',
+};
+
+/** My listings (S-04 manage, S-05 dashboard). Requires login. */
 export function MyListingsPage() {
   const { state, update, toast } = useStore();
   const go = useGo();
@@ -49,7 +60,7 @@ export function MyListingsPage() {
   const publish = (l) => {
     const e = validateListing(l);
     if (Object.keys(e).length) return go('editor', { id: l.id }, { errors: e });
-    setStatus(l.id, 'active', 'Published. It now appears in Browse.');
+    setStatus(l.id, 'active', 'Your listing is live. It now appears in Browse listings.');
   };
 
   const actions = (l) => {
@@ -57,40 +68,44 @@ export function MyListingsPage() {
       return (
         <ConfirmInline question="Withdraw this listing?">
           <Button variant="danger" size="sm" onClick={() => withdraw(l.id)}>
-            Withdraw
+            Yes, withdraw
           </Button>
-          <Button variant="quiet" size="sm" onClick={() => setConfirm(null)}>
-            Keep
-          </Button>
+          <button type="button" className={linkBtn} onClick={() => setConfirm(null)}>
+            Keep it
+          </button>
         </ConfirmInline>
       );
     const n = openReqs(l);
     return (
-      <span className="inline-flex flex-wrap justify-end gap-1">
+      <span className="inline-flex flex-wrap justify-end gap-x-4 gap-y-1">
         {['draft', 'active'].includes(l.status) && (
-          <Button variant="quiet" size="sm" to={to('editor', { id: l.id })}>
-            Edit
-          </Button>
+          <Link to={to('editor', { id: l.id })} className={linkBtn}>
+            Edit<span className="sr-only"> {l.title}</span>
+          </Link>
         )}
         {l.status === 'draft' && (
-          <Button variant="secondary" size="sm" onClick={() => publish(l)}>
-            Publish
-          </Button>
+          <button type="button" className={linkBtn} onClick={() => publish(l)}>
+            Publish<span className="sr-only"> {l.title}</span>
+          </button>
         )}
         {['active', 'reserved'].includes(l.status) && n > 0 && (
-          <Button variant="secondary" size="sm" to={to('incoming', { listing: l.id })}>
+          <Link to={to('incoming', { listing: l.id })} className={linkBtn}>
             Requests ({n})
-          </Button>
+          </Link>
         )}
         {['draft', 'active'].includes(l.status) && (
-          <Button variant="quiet" size="sm" className="text-bad! hover:text-bad!" onClick={() => setConfirm(l.id)}>
-            Withdraw
-          </Button>
+          <button
+            type="button"
+            className="text-bad text-sm underline underline-offset-3 hover:decoration-2"
+            onClick={() => setConfirm(l.id)}
+          >
+            Withdraw<span className="sr-only"> {l.title}</span>
+          </button>
         )}
         {l.status === 'withdrawn' && (
-          <Button variant="quiet" size="sm" onClick={() => setStatus(l.id, 'draft', 'Moved to drafts')}>
+          <button type="button" className={linkBtn} onClick={() => setStatus(l.id, 'draft', 'Moved to drafts')}>
             Move to drafts
-          </Button>
+          </button>
         )}
       </span>
     );
@@ -98,52 +113,27 @@ export function MyListingsPage() {
 
   return (
     <div className={page}>
-      <PageHead
-        title="My Listings"
-        actions={
-          <Button to="/rehome" variant="primary">
-            New listing
-          </Button>
-        }
-      >
-        Everything you’ve listed, and where each one is up to.
+      <PageHead title="My listings" actions={<Button to="/rehome">Rehome another</Button>}>
+        Everything you have listed, and where each one is up to.
       </PageHead>
-      <div className="mb-6 grid grid-cols-4 gap-3 max-sm:grid-cols-2">
-        {[
-          ['Active', 'active'],
-          ['Reserved', 'reserved'],
-          ['Drafts', 'draft'],
-          ['Rehomed', 'rehomed'],
-        ].map(([t, st]) => (
-          <div key={st} className="rounded-ab border-line bg-surface grid gap-0.5 border px-4 py-3">
-            <span className={label}>{t}</span>
-            <b className="font-display text-xl tabular-nums">{count(st)}</b>
-          </div>
-        ))}
-      </div>
       <Tabs
         value={tab}
         onChange={(t) => {
           setTab(t);
           setConfirm(null);
         }}
-        tabs={['all', ...LISTING_STATUS].map((t) => [
-          t,
-          t[0].toUpperCase() + t.slice(1),
-          t === 'all' ? mine.length : count(t),
-        ])}
+        tabs={['all', ...LISTING_STATUS].map((t) => [t, TAB_LABEL[t], t === 'all' ? mine.length : count(t)])}
       />
       {shown.length ? (
         <div className={tableWrap}>
           <table className={table}>
             <thead>
               <tr>
-                <th>Listing</th>
-                <th>Species</th>
-                <th>Status</th>
-                <th>Open requests</th>
-                <th>Listed</th>
-                <th>
+                <th scope="col">Listing</th>
+                <th scope="col">Status</th>
+                <th scope="col">Open requests</th>
+                <th scope="col">Listed</th>
+                <th scope="col">
                   <span className="sr-only">Actions</span>
                 </th>
               </tr>
@@ -152,28 +142,35 @@ export function MyListingsPage() {
               {shown.map((l, i) => (
                 <tr key={l.id} data-tour={i === 0 ? 'listing-row' : undefined}>
                   <td>
-                    <Link className="font-bold" to={to('listing', { id: l.id })}>
+                    <Link className="font-semibold" to={to('listing', { id: l.id })}>
                       {l.title}
                     </Link>
-                    <div className={cx(mono, 'text-ink-2')}>{l.id}</div>
-                  </td>
-                  <td>
-                    {speciesFor(l).common} × {l.qty}
+                    <div className="text-ink-2">
+                      {speciesFor(l).common} × {l.qty}
+                    </div>
                   </td>
                   <td>
                     <Chip status={l.status} />
                   </td>
-                  <td className="font-mono">{openReqs(l)}</td>
-                  <td className="font-mono">{l.created}</td>
-                  <td className="text-right whitespace-nowrap">{actions(l)}</td>
+                  <td className="tabular-nums">{openReqs(l)}</td>
+                  <td className="whitespace-nowrap tabular-nums">{l.created}</td>
+                  <td className="text-right">{actions(l)}</td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
       ) : (
-        <Empty title={`No ${tab} listings.`}>
-          <span className="text-sm">Listings appear here after you complete the rehoming questions.</span>
+        <Empty
+          title={
+            tab === 'all'
+              ? 'You have not listed anything yet.'
+              : `You have no listings that are ${statusLabel(tab).toLowerCase()}.`
+          }
+        >
+          <Button to="/rehome" variant="secondary">
+            Rehome an animal or plant
+          </Button>
         </Empty>
       )}
     </div>

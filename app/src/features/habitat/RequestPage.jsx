@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link, useNavigate, useParams } from 'react-router';
+import { useNavigate, useParams } from 'react-router';
 import { to } from '../../routes';
 import { USERS } from '../../services/contracts';
 import * as RequestService from '../../services/requestService';
@@ -7,20 +7,21 @@ import { byId } from '../../services/seed';
 import { useStore } from '../../services/store';
 import { Button } from '../../shared/components/Button';
 import { Chip } from '../../shared/components/Chip';
-import { Empty, Notice, PageHead } from '../../shared/components/Feedback';
-import { Field, FieldError } from '../../shared/components/Form';
-import { focusFirstError, useUi } from '../../shared/hooks';
-import { cx, formFoot, label, mono, page, panel, panelQuiet, stack, sticky, twoPane } from '../../shared/styles';
+import { BackLink, Empty, Notice, PageHead } from '../../shared/components/Feedback';
+import { Check, ErrorSummary, Field } from '../../shared/components/Form';
+import { useGo, useUi } from '../../shared/hooks';
+import { cx, formFoot, page, panel, stack, sticky, twoPane } from '../../shared/styles';
 import { ListingCard } from '../listings/ListingCard';
 import { evaluateCompat, safeSummary } from './compat';
 import { HabitatSummary } from './HabitatSummary';
 
-/** Request adoption form (M-06). Calls Shawn's RequestService.submit (S-08). Requires login. */
+/** Request adoption form (M-06). Calls Shawn's RequestService.submit (S-08), then shows the confirmation page. Requires login. */
 export function RequestPage() {
   const { id, hab } = useParams();
   const ui = useUi();
-  const { state, update, toast } = useStore();
+  const { state, update } = useStore();
   const navigate = useNavigate();
+  const go = useGo();
   const [intro, setIntro] = useState(ui.intro || '');
   const [ack, setAck] = useState(false);
   const [errors, setErrors] = useState({});
@@ -31,7 +32,7 @@ export function RequestPage() {
   if (!l || !h)
     return (
       <div className={page}>
-        <Empty title="Run a compatibility check first.">
+        <Empty title="Check your tank or pond against a listing first.">
           <Button to="/browse" variant="secondary">
             Browse listings
           </Button>
@@ -41,15 +42,17 @@ export function RequestPage() {
 
   const res = evaluateCompat(l, h);
   const owner = USERS[l.owner].short;
+  const firstName = owner.split(' ')[0];
   const submit = (e) => {
     e.preventDefault();
     const text = intro.trim();
     const err = {};
-    if (text.length < 30) err.intro = `Write a little more (${text.length}/30 characters).`;
-    if (!ack) err.ack = 'Tick the box to continue.';
+    if (text.length < 30)
+      err.intro = `Write at least 30 characters to introduce yourself (you have written ${text.length})`;
+    if (!ack) err.ack = 'Confirm that you understand the result is a guide';
     setErrors(err);
     setServiceError(null);
-    if (Object.keys(err).length) return focusFirstError();
+    if (Object.keys(err).length) return;
     try {
       const r = update((s) =>
         RequestService.submit(s, {
@@ -60,8 +63,7 @@ export function RequestPage() {
           compat: res.outcome,
         }),
       );
-      navigate('/account/requests');
-      toast(`Request ${r.id} sent to ${owner}`);
+      navigate(to('sent', { id: r.id }));
     } catch (ex) {
       setServiceError(ex.message);
     }
@@ -69,69 +71,69 @@ export function RequestPage() {
 
   return (
     <div className={page}>
-      <p className="text-sm [&_a]:no-underline">
-        <Link to={to('compat', { id: l.id })}>← Compatibility result</Link>
-      </p>
-      <PageHead title="Request adoption" className="mt-3">
-        {`${owner} will see your introduction and a summary of your habitat.`}
+      <PageHead
+        title={`Ask ${firstName} to adopt`}
+        crumb={
+          <BackLink
+            href={to('compat', { id: l.id })}
+            onClick={(e) => (e.preventDefault(), go('compat', { id: l.id }, { hab: h.id }))}
+          >
+            Back to the compatibility check
+          </BackLink>
+        }
+      >
+        {`${owner} will see your introduction and a summary of your ${h.type}. They can accept or decline.`}
       </PageHead>
       <div className={twoPane}>
-        <form className={cx(panel, stack)} noValidate onSubmit={submit}>
-          <div className="grid gap-1.5">
-            <span className="text-sm font-bold">Habitat</span>
-            <div className={cx(panelQuiet, 'flex flex-wrap items-center justify-between gap-3')}>
-              <span>
-                <strong>{h.name}</strong> <span className={cx(mono, 'text-ink-2')}>{h.id}</span>
-              </span>
-              <Chip status={res.outcome} />
-            </div>
-          </div>
-          <Field
-            id="intro"
-            label="Introduce yourself"
-            required
-            hint="At least 30 characters. Don’t include your phone number or address."
-            error={errors.intro}
-          >
-            <textarea
-              id="intro"
-              value={intro}
-              onChange={(e) => setIntro(e.target.value)}
-              placeholder="Your experience, your setup and when you could collect"
-              data-tour="intro"
-            />
-          </Field>
-          <div className={cx('grid gap-1.5', errors.ack && 'has-error')}>
-            <label className="flex items-start gap-2.5 text-sm">
-              <input
-                type="checkbox"
-                id="ack"
-                checked={ack}
-                onChange={(e) => setAck(e.target.checked)}
-                className="accent-primary mt-1 size-[18px]"
-              />
-              <span>
-                I understand the compatibility result is a guide, and I’ll check the details with the owner before
-                collecting.
-              </span>
-            </label>
-            <FieldError id="ack">{errors.ack}</FieldError>
-          </div>
+        <div>
+          <ErrorSummary errors={errors} />
           {serviceError && (
-            <Notice tone="bad" role="alert" title="Couldn’t send request">
+            <Notice tone="bad" role="alert" title="Your request could not be sent" className="mb-8">
               {serviceError}
             </Notice>
           )}
-          <div className={cx(formFoot, 'mt-0')}>
-            <Button variant="secondary" to={to('compat', { id: l.id })}>
-              Back
-            </Button>
-            <Button type="submit">Send request</Button>
-          </div>
-        </form>
-        <aside className={cx(stack, sticky)}>
-          <span className={label}>What the owner will see</span>
-          <div className={panel}>
+          <form noValidate onSubmit={submit} className="grid gap-8">
+            <div className="grid gap-1.5">
+              <span className="font-semibold">Tank or pond</span>
+              <div className="flex flex-wrap items-center gap-3">
+                <span>{h.name}</span>
+                <Chip status={res.outcome} />
+              </div>
+            </div>
+            <Field
+              id="intro"
+              label="Introduce yourself"
+              hint="Say what experience you have, describe your setup and when you could collect. Do not include your phone number or address."
+              error={errors.intro}
+            >
+              <textarea
+                id="intro"
+                rows={6}
+                value={intro}
+                onChange={(e) => setIntro(e.target.value)}
+                data-tour="intro"
+              />
+            </Field>
+            <Field id="ack-field" error={errors.ack}>
+              <Check id="ack" checked={ack} onChange={setAck}>
+                I understand the compatibility result is a guide, and I will check the details with {firstName} before
+                collecting.
+              </Check>
+            </Field>
+            <div className={cx(formFoot, 'mt-0')}>
+              <Button type="submit">Send request</Button>
+              <Button variant="quiet" onClick={() => go('compat', { id: l.id }, { hab: h.id })}>
+                Cancel
+              </Button>
+            </div>
+          </form>
+        </div>
+        <aside className={cx(stack, sticky)} aria-label="What the owner will see">
+          <div className={cx(panel, 'grid gap-3')}>
+            <h2 className="text-lg">What {firstName} will see</h2>
+            <p className="text-ink-2 text-sm">
+              Your introduction and these details. Not your address or the name of your tank.
+            </p>
             <HabitatSummary habitat={safeSummary(h)} />
           </div>
           <ListingCard listing={l} />

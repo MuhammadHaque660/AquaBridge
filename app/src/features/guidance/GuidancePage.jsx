@@ -4,25 +4,19 @@ import { SPECIES } from '../../services/species';
 import { useStore } from '../../services/store';
 import { Button } from '../../shared/components/Button';
 import { Chip } from '../../shared/components/Chip';
-import { Notice, PageHead } from '../../shared/components/Feedback';
-import { cx, mono, page, reasons, row, stack, stackLg, sticky } from '../../shared/styles';
+import { Notice } from '../../shared/components/Feedback';
+import { cx, page, reasons, sticky } from '../../shared/styles';
 import { CareWidget } from './CareWidget';
 import { qwrap } from './RehomePage';
 import { evaluateIntake } from './rules';
 
-const EDGE = { ok: 'before:bg-ok', warn: 'before:bg-warn', bad: 'before:bg-bad' };
+const EDGE = { ok: 'border-ok', warn: 'border-warn', bad: 'border-bad' };
 
-/** Coloured-edge outcome card, shared by guidance (F-04) and compatibility (M-04). */
-export function Outcome({ tone, children, ...rest }) {
+/** Result box with a thick coloured left edge, shared by guidance (F-04) and compatibility (M-04). */
+export function Outcome({ tone, children, className, ...rest }) {
   return (
-    <section
-      className={cx(
-        "rounded-ab border-line bg-surface grid grid-cols-[6px_1fr] overflow-hidden border before:content-['']",
-        EDGE[tone],
-      )}
-      {...rest}
-    >
-      <div className="grid gap-3 p-6">{children}</div>
+    <section className={cx('rounded-r-ab bg-mist grid gap-3 border-l-8 px-6 py-5', EDGE[tone], className)} {...rest}>
+      {children}
     </section>
   );
 }
@@ -32,7 +26,7 @@ const HEAD = {
   needs_review: [
     'warn',
     'We need more information first',
-    'A public listing isn’t available yet. Here is what to do next.',
+    'A public listing isn’t available yet. Here’s what to do next.',
   ],
   restricted: ['bad', 'This can’t be listed publicly', 'Ordinary rehoming listings are not offered for this species.'],
 };
@@ -45,7 +39,7 @@ export function GuidancePage() {
   const g = state.intake.outcome || evaluateIntake(a);
   const s = SPECIES[a.speciesId] || {};
   const [tone, title, summary] = HEAD[g.outcome];
-  const alt = {
+  const next = {
     eligible: [
       a.urgency === 'week'
         ? 'Short on time? Ask a local aquatic shop or fishkeeping club whether they take in rehomes while you wait for an adopter.'
@@ -67,66 +61,72 @@ export function GuidancePage() {
       'Read the GOV.UK guidance on invasive non-native species.',
     ],
   }[g.outcome];
-  const restart = (step, reset) => {
+  const restart = (reset) => {
     update((d) => {
       if (reset) d.intake = freshIntake();
-      else d.intake.step = step;
+      else d.intake.step = 1;
     });
     navigate('/rehome');
   };
 
   return (
     <div className={page}>
-      <PageHead eyebrow="Example outcome · Sprint 1 sample rules" title="Your rehoming guidance" />
       <div className={qwrap}>
-        <div className={stackLg}>
-          <Outcome tone={tone}>
-            <div className={row}>
-              <Chip status={g.outcome} />
-              <span className={cx(mono, 'text-ink-2')}>
-                {s.common || ''} × {a.quantity}
-              </span>
-            </div>
-            <h2 className="text-2xl">{title}</h2>
-            <p className="text-ink-2">{summary}</p>
-            <h3 className="text-md mt-2">Why you’re seeing this</h3>
+        <div className="grid max-w-2xl gap-10">
+          <div className="grid gap-2">
+            <p className="text-md text-ink-2">
+              Your rehoming guidance
+              {s.common ? ` for ${a.quantity ? `${a.quantity} × ` : ''}${s.common.toLowerCase()}` : ''}
+            </p>
+            <Outcome tone={tone}>
+              <div>
+                <Chip status={g.outcome} />
+              </div>
+              <h1>{title}</h1>
+              <p className="text-md">{summary}</p>
+            </Outcome>
+          </div>
+          <section className="grid gap-3">
+            <h2 className="text-lg">Why you’re seeing this</h2>
             <ul className={reasons}>
               {g.reasons.map((r) => (
                 <li key={r}>{r}</li>
               ))}
             </ul>
-          </Outcome>
-          <section className={stack}>
-            <h3>{g.outcome === 'eligible' ? 'Also worth doing' : 'What you can do instead'}</h3>
+          </section>
+          <section className="grid gap-3">
+            <h2 className="text-lg">{g.outcome === 'eligible' ? 'Also worth doing' : 'What you can do next'}</h2>
             <ul className={reasons}>
-              {alt.map((x) => (
+              {next.map((x) => (
                 <li key={x}>{x}</li>
               ))}
             </ul>
           </section>
-          <div className={row}>
-            {g.outcome === 'eligible' && (
-              <Button data-tour="create-listing" onClick={() => navigate('/listings/new?from=intake')}>
-                Create my listing
+          <div className="grid gap-3">
+            <div className="flex flex-wrap items-center gap-4">
+              {g.outcome === 'eligible' && (
+                <Button data-tour="create-listing" onClick={() => navigate('/listings/new?from=intake')}>
+                  Create my listing
+                </Button>
+              )}
+              <Button variant="secondary" onClick={() => restart(false)}>
+                Change my answers
               </Button>
+              <Button variant="quiet" onClick={() => restart(true)}>
+                Start again
+              </Button>
+            </div>
+            {g.outcome === 'eligible' && !state.user && (
+              <p className="text-ink-2 text-sm">
+                You’ll be asked to sign in. Your answers are kept and used to fill in the listing.
+              </p>
             )}
-            <Button variant="secondary" onClick={() => restart(1)}>
-              Change my answers
-            </Button>
-            <Button variant="quiet" onClick={() => restart(1, true)}>
-              Start again
-            </Button>
           </div>
-          {g.outcome === 'eligible' && !state.user && (
-            <p className="text-ink-2 text-sm">
-              You’ll be asked to sign in. Your answers will be kept and used to fill in the listing.
-            </p>
-          )}
-          <Notice title="Illustrative only">
-            Sprint 1 uses example rules. This is not a legal or veterinary decision.
+          <Notice title="These are example rules">
+            Sprint 1 uses illustrative rules. This is not a legal or veterinary decision.
           </Notice>
         </div>
-        <aside className={sticky}>
+        <aside className={cx(sticky, 'max-lg:hidden')}>
           <CareWidget speciesId={a.speciesId} />
         </aside>
       </div>

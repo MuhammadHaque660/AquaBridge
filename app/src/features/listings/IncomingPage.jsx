@@ -10,10 +10,12 @@ import { Chip } from '../../shared/components/Chip';
 import { ConfirmInline, DemoControl, Empty, Notice, PageHead } from '../../shared/components/Feedback';
 import { Tracker } from '../../shared/components/Tracker';
 import { useUi } from '../../shared/hooks';
-import { cx, label, mono, page, panel, row, stack, stackLg } from '../../shared/styles';
+import { box, cx, page, readable, row, stack, stackLg } from '../../shared/styles';
 import { HabitatSummary } from '../habitat/HabitatSummary';
 
-/** Incoming requests (S-06 inbox, S-07 decisions and handover). Requires login. */
+const linkBtn = 'text-sm text-primary underline underline-offset-3 hover:text-primary-hover hover:decoration-2';
+
+/** Requests for my listings (S-06 inbox, S-07 decisions and handover). Requires login. */
 export function IncomingPage() {
   const { state, run } = useStore();
   const [search] = useSearchParams();
@@ -32,9 +34,11 @@ export function IncomingPage() {
   if (!all.length)
     return (
       <div className={page}>
-        <PageHead title="Incoming requests" />
-        <Empty title="No requests yet.">
-          <span className="text-sm">When an adopter sends a request for one of your listings, it appears here.</span>
+        <PageHead title="Requests for my listings" />
+        <Empty title="No one has asked to adopt yet.">
+          <p className="text-ink-2 text-sm">
+            When an adopter sends a request for one of your listings, it appears here.
+          </p>
         </Empty>
       </div>
     );
@@ -50,7 +54,7 @@ export function IncomingPage() {
   if (r.status === 'pending') {
     actions = hasAccepted ? (
       <Notice tone="warn" title="On hold" data-tour="on-hold">
-        You accepted another request for this listing. Only one request can be accepted.
+        You have accepted another request for this listing. Only one request can be accepted at a time.
       </Notice>
     ) : confirm === r.id ? (
       <ConfirmInline question={`Decline ${adopter.short}’s request?`}>
@@ -62,148 +66,143 @@ export function IncomingPage() {
             run((d) => RequestService.decline(d, r.id, state.user), 'Request declined');
           }}
         >
-          Decline
+          Yes, decline
         </Button>
-        <Button variant="quiet" size="sm" onClick={() => setConfirm(null)}>
+        <button type="button" className={linkBtn} onClick={() => setConfirm(null)}>
           Cancel
-        </Button>
+        </button>
       </ConfirmInline>
     ) : (
-      <div className="grid gap-4">
-        <div className={row}>
+      <section className="border-line grid gap-3 border-t pt-6">
+        <h3>Your decision</h3>
+        <p className="text-ink-2 text-sm">Accepting reserves the listing and takes it out of Browse listings.</p>
+        <div className={cx(row, 'gap-5')}>
           <Button
             data-tour="accept"
             onClick={() =>
-              run((d) => RequestService.accept(d, r.id, state.user), 'Request accepted. The listing is now reserved.')
+              run((d) => RequestService.accept(d, r.id, state.user), 'Request accepted. Your listing is now reserved.')
             }
           >
             Accept request
           </Button>
-          <Button variant="danger" onClick={() => setConfirm(r.id)}>
+          <button
+            type="button"
+            className="text-md text-bad underline underline-offset-3 hover:decoration-2"
+            onClick={() => setConfirm(r.id)}
+          >
             Decline
-          </Button>
+          </button>
         </div>
-        <p className="text-ink-2 text-sm">Accepting reserves the listing and hides it from browsing.</p>
-      </div>
+      </section>
     );
   } else if (r.status === 'accepted') {
     actions = (
-      <div className={stack}>
+      <section className={cx(stack, 'border-line border-t pt-6')}>
         <h3>Handover</h3>
         <Tracker request={r} />
         {r.ownerConfirmed ? (
-          <p className="text-sm">You confirmed the handover. Waiting for {adopter.short} to confirm.</p>
+          <p className="text-sm">You have confirmed the handover. We are waiting for {adopter.short} to confirm.</p>
         ) : (
           <>
             <p className="text-sm">
-              Once the {s.kind === 'plant' ? 'plants have' : 'animals have'} been handed over, confirm it here. Both of
-              you need to confirm.
+              Once the {s.kind === 'plant' ? 'plants have' : 'animals have'} been handed over, confirm it here. You and
+              the adopter both need to confirm.
             </p>
             <div>
               <Button
                 onClick={() => run((d) => RequestService.confirmHandover(d, r.id, state.user), 'Handover confirmed')}
               >
-                Confirm handover happened
+                Confirm the handover happened
               </Button>
             </div>
           </>
         )}
         {!r.adopterConfirmed && (
-          <DemoControl text="The adopter confirms in their own My Requests page. Use this to play their side.">
+          <DemoControl text="The adopter confirms on their own adoption requests page. Use this to play their side.">
             <Button
               variant="secondary"
               size="sm"
               onClick={() =>
-                run((d) => RequestService.confirmHandover(d, r.id, r.adopter), 'Adopter confirmed the handover')
+                run((d) => RequestService.confirmHandover(d, r.id, r.adopter), 'The adopter confirmed the handover')
               }
             >
               Confirm as {adopter.short}
             </Button>
           </DemoControl>
         )}
-      </div>
+      </section>
     );
   } else if (r.status === 'completed') {
     actions = (
-      <div className={stack}>
+      <section className={cx(stack, 'border-line border-t pt-6')}>
         <h3>Handover</h3>
         <Tracker request={r} />
         <Notice tone="ok" title="Rehoming complete" data-tour="complete">
-          The listing is marked rehomed and removed from browsing.
+          The listing is marked as rehomed and no longer appears in Browse listings.
         </Notice>
-      </div>
+      </section>
     );
-  } else actions = <p className="text-ink-2 text-sm">You declined this request.</p>;
+  } else actions = <p className="border-line text-ink-2 border-t pt-6 text-sm">You declined this request.</p>;
 
   return (
     <div className={page}>
-      <PageHead title="Incoming requests">
-        Compare adopters by their introduction and habitat. Only the details needed to decide are shared with you.
+      <PageHead title="Requests for my listings">
+        Compare adopters by their introduction and their tank or pond. You only see the details you need to decide.
       </PageHead>
-      <div className="grid grid-cols-[340px_minmax(0,1fr)] items-start gap-6 max-lg:grid-cols-1">
-        <nav
-          className="rounded-ab border-line bg-surface grid overflow-hidden border"
-          aria-label="Requests"
-          data-tour="request-list"
-        >
-          {groups.map((g, gi) => (
-            <div key={g} className="contents">
-              <div className={cx(label, 'bg-surface-2 px-4 py-2', gi > 0 && 'border-line border-t')}>
-                {byId(state.listings, g).title}
-              </div>
-              {all
-                .filter((x) => x.listingId === g)
-                .map((x) => (
-                  <button
-                    key={x.id}
-                    type="button"
-                    aria-current={x.id === r.id}
-                    onClick={() => {
-                      setSel(x.id);
-                      setConfirm(null);
-                    }}
-                    className="border-line aria-[current=true]:bg-primary-soft grid gap-1 border-t px-4 py-3 text-left aria-[current=true]:shadow-[inset_3px_0_0_var(--color-primary)]"
-                  >
-                    <span className="flex flex-wrap items-center justify-between gap-3">
-                      <strong>{USERS[x.adopter].short}</strong>
-                      <Chip status={x.status} />
-                    </span>
-                    <span className="text-ink-2 text-sm">
-                      {x.created} · <span className={mono}>{x.id}</span>
-                    </span>
-                  </button>
-                ))}
+      <div className="grid grid-cols-[320px_minmax(0,1fr)] items-start gap-10 max-lg:grid-cols-1 max-lg:gap-6">
+        <nav className="grid gap-6" aria-label="Requests" data-tour="request-list">
+          {groups.map((g) => (
+            <div key={g} className="grid gap-1">
+              <h2 className="text-md pb-1">{byId(state.listings, g).title}</h2>
+              <ul className="m-0 grid list-none gap-1 p-0">
+                {all
+                  .filter((x) => x.listingId === g)
+                  .map((x) => (
+                    <li key={x.id}>
+                      <button
+                        type="button"
+                        aria-current={x.id === r.id}
+                        onClick={() => {
+                          setSel(x.id);
+                          setConfirm(null);
+                        }}
+                        className="rounded-ab-sm hover:bg-mist aria-[current=true]:border-primary aria-[current=true]:bg-primary-soft grid w-full gap-1 border-l-4 border-transparent px-4 py-3 text-left"
+                      >
+                        <span className="flex flex-wrap items-center justify-between gap-2">
+                          <span className="font-semibold">{USERS[x.adopter].name}</span>
+                          <Chip status={x.status} />
+                        </span>
+                        <span className="text-ink-2 text-sm">Sent {x.created}</span>
+                      </button>
+                    </li>
+                  ))}
+              </ul>
             </div>
           ))}
         </nav>
-        <article className={cx(panel, stackLg)} aria-live="polite">
+        <article className={cx(box, stackLg, 'max-sm:p-5')} aria-live="polite">
           <div className="grid gap-2">
-            <div className={row}>
-              <Chip status={r.status} />
-              <span className={cx(mono, 'text-ink-2')}>
-                {r.id} · {l.id}
-              </span>
-            </div>
             <h2>
               {adopter.name} would like your {s.common.toLowerCase()}
             </h2>
             <p className="text-ink-2 text-sm">
               For “{l.title}” · sent {r.created}
             </p>
+            <div>
+              <Chip status={r.status} />
+            </div>
           </div>
           <section className="grid gap-2">
             <h3>Their introduction</h3>
-            <p className="max-w-[65ch]">{r.intro}</p>
+            <p className={readable}>{r.intro}</p>
           </section>
           <section className="grid gap-3">
-            <div className="flex flex-wrap items-center justify-between gap-3">
-              <h3>Habitat summary</h3>
+            <div className="flex flex-wrap items-center gap-3">
+              <h3>Their tank or pond</h3>
               <Chip status={r.compat} />
             </div>
             <HabitatSummary habitat={r.summary} />
-            <p className="text-ink-2 text-sm">
-              Shared by the adopter’s habitat profile. Their address and profile name are not shown.
-            </p>
+            <p className="text-ink-2 text-sm">Their address and the name of their tank are not shared with you.</p>
           </section>
           {actions}
         </article>

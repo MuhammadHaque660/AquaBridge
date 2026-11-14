@@ -1,18 +1,19 @@
-import { Link, useNavigate } from 'react-router';
+import { useNavigate } from 'react-router';
 import { CONDITION, REASON, URGENCY } from '../../services/contracts';
 import { SPECIES } from '../../services/species';
 import { useStore } from '../../services/store';
 import { Button } from '../../shared/components/Button';
-import { PageHead } from '../../shared/components/Feedback';
-import { formFoot, page, panel, sticky } from '../../shared/styles';
+import { BackLink } from '../../shared/components/Feedback';
+import { cx, formFoot, page, sticky } from '../../shared/styles';
 import { CareWidget } from './CareWidget';
 import { qwrap } from './RehomePage';
 import { evaluateIntake } from './rules';
 
-const TABLE =
-  'w-full border-collapse [&_td]:border-b [&_td]:border-line [&_td]:py-3 [&_td]:pr-3 [&_td]:align-top [&_th]:w-[34%] [&_th]:border-b [&_th]:border-line [&_th]:py-3 [&_th]:pr-3 [&_th]:text-left [&_th]:align-top [&_th]:text-sm [&_th]:font-normal [&_th]:text-ink-2';
+/** Summary list row: label, answer, Change link (GOV.UK "check answers" pattern). */
+const ROW =
+  'grid grid-cols-[minmax(0,34%)_1fr_auto] gap-x-4 gap-y-1 border-b border-line py-3 max-sm:grid-cols-[1fr_auto]';
 
-/** Review answers (F-03): every group has a Change link back to its step. */
+/** Review answers (F-03): every answer has a Change link back to its step. */
 export function ReviewPage() {
   const { state, update } = useStore();
   const navigate = useNavigate();
@@ -31,69 +32,63 @@ export function ReviewPage() {
     });
     navigate('/rehome/guidance');
   };
-  const row = (k, v) => (
-    <tr key={k}>
-      <th scope="row">{k}</th>
-      <td>{v || <span className="text-ink-2">Not given</span>}</td>
-    </tr>
-  );
-  const group = (title, step, rows) => (
-    <div key={title} className="contents">
-      <div className="mt-6 flex items-center justify-between">
-        <h3>{title}</h3>
-        <Button variant="quiet" size="sm" onClick={() => editStep(step)}>
-          Change
-        </Button>
-      </div>
-      <table className={TABLE}>
-        <tbody>{rows}</tbody>
-      </table>
-    </div>
-  );
+
+  const rows = [
+    ['Type', a.kind === 'plant' ? 'Plant' : 'Animal', 1],
+    ['Species', s.common, 2],
+    ['How many', a.quantity, 2],
+    a.kind === 'plant' && ['Growing in', a.grownIn === 'pond' ? 'Pond' : 'Aquarium', 2],
+    ['Condition', CONDITION[a.condition], 3],
+    a.health && ['Problem or treatment', a.health, 3],
+    ['Reason for rehoming', REASON[a.reason], 3],
+    ['Location', a.location, 4],
+    ['How soon', URGENCY[a.urgency], 4],
+    ['Other details', a.details, 4],
+  ].filter(Boolean);
+
   return (
     <div className={page}>
-      <PageHead
-        title="Check your answers"
-        crumb={
-          <Link
-            to="/rehome"
-            onClick={(e) => {
-              e.preventDefault();
-              editStep(4);
-            }}
-          >
-            ← Back to questions
-          </Link>
-        }
-      >
-        Guidance is based only on what you tell us. Change anything that isn’t right.
-      </PageHead>
+      <p className="mb-8">
+        <BackLink
+          href="/rehome"
+          onClick={(e) => {
+            e.preventDefault();
+            editStep(4);
+          }}
+        >
+          Back
+        </BackLink>
+      </p>
       <div className={qwrap}>
-        <div className={panel} data-tour="review">
-          {group('Organism', 1, [row('Type', a.kind === 'plant' ? 'Plant' : 'Animal')])}
-          {group('Species', 2, [
-            row('Species', s.common),
-            row('Quantity', a.quantity),
-            a.kind === 'plant' && row('Growing in', a.grownIn || 'aquarium'),
-          ])}
-          {group('Condition', 3, [
-            row('Condition', CONDITION[a.condition]),
-            a.health && row('Details', a.health),
-            row('Reason', REASON[a.reason]),
-          ])}
-          {group('Location and timing', 4, [
-            row('Location', a.location),
-            row('Timing', URGENCY[a.urgency]),
-            row('Other details', a.details),
-          ])}
+        <div className="max-w-2xl">
+          <h1 className="mb-3">Check your answers before getting guidance</h1>
+          <p className="text-md text-ink-2 mb-8">
+            Guidance is based only on what you tell us. Change anything that isn’t right.
+          </p>
+          <dl className="border-line m-0 border-t" data-tour="review">
+            {rows.map(([k, v, step]) => (
+              <div key={k} className={ROW}>
+                <dt className="font-semibold max-sm:col-span-2">{k}</dt>
+                <dd className={cx('m-0', !v && 'text-ink-2')}>{v || 'Not given'}</dd>
+                <dd className="m-0 text-right">
+                  <a
+                    href="/rehome"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      editStep(step);
+                    }}
+                  >
+                    Change<span className="sr-only"> {k.toLowerCase()}</span>
+                  </a>
+                </dd>
+              </div>
+            ))}
+          </dl>
           <div className={formFoot}>
-            <Button variant="secondary" onClick={() => editStep(4)}>
-              ← Back
-            </Button>
-            <Button onClick={seeGuidance}>See my guidance</Button>
+            <Button onClick={seeGuidance}>Get my guidance</Button>
           </div>
         </div>
-        <aside className={sticky}>
+        <aside className={cx(sticky, 'max-lg:hidden')}>
           <CareWidget speciesId={a.speciesId} />
         </aside>
       </div>

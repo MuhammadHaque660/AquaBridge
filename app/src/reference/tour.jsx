@@ -5,7 +5,7 @@ import { to } from '../routes';
 import { seed } from '../services/seed';
 import { useStore } from '../services/store';
 import { Button } from '../shared/components/Button';
-import { cx, label } from '../shared/styles';
+import { cx } from '../shared/styles';
 import { FLOWS } from './flows';
 
 const TourContext = createContext({ tour: null });
@@ -98,11 +98,8 @@ export function TourPanel() {
 
   if (tour.min)
     return (
-      <Button
-        className={cx(fixed, 'max-w-[calc(100%-32px)] shadow-[0_10px_28px_rgba(18,50,74,.25)]')}
-        onClick={toggleMin}
-      >
-        {f.short} · step {tour.i + 1} of {n} · Show guide
+      <Button className={cx(fixed, 'shadow-card max-w-[calc(100%-32px)]')} onClick={toggleMin}>
+        Show demo guide · step {tour.i + 1} of {n}
       </Button>
     );
 
@@ -112,40 +109,42 @@ export function TourPanel() {
       aria-live="polite"
       className={cx(
         fixed,
-        'rounded-ab border-line border-t-primary bg-surface grid max-h-[min(72vh,580px)] w-[min(390px,calc(100%-32px))] gap-3 overflow-auto border border-t-4 px-6 py-4 shadow-[0_18px_48px_rgba(18,50,74,.22)]',
+        'rounded-ab border-line bg-surface grid max-h-[min(72vh,600px)] w-[min(400px,calc(100%-32px))] gap-3 overflow-auto border p-5 shadow-[0_12px_40px_rgb(19_41_61/0.18)]',
         'max-sm:left-[max(16px,env(safe-area-inset-left,0px))] max-sm:max-h-[50vh] max-sm:w-auto',
       )}
     >
-      <div className="flex items-center justify-between">
-        <span className={label}>{f.short}</span>
+      <div className="flex items-center justify-between gap-3">
+        <p className="text-ink-2 text-sm font-semibold">
+          {f.short} · Step {tour.i + 1} of {n}
+        </p>
         <Button variant="quiet" size="sm" onClick={toggleMin}>
-          Minimise
+          Hide
         </Button>
       </div>
-      <div className="bg-surface-2 h-1 overflow-hidden rounded-[2px]" aria-hidden="true">
+      <div className="bg-surface-2 h-1 overflow-hidden rounded-full" aria-hidden="true">
         <span
           className="bg-primary block h-full transition-[width] duration-250"
           style={{ width: `${((tour.i + 1) / n) * 100}%` }}
         />
       </div>
-      <p className="text-ink-2 text-sm">
-        Step {tour.i + 1} of {n} · <strong className="text-ink">{st.actor}</strong>
-      </p>
-      <h3 className="text-[1.1875rem]">{st.title}</h3>
-      <p>{st.say}</p>
-      <div className="rounded-ab-sm bg-surface-2 [&_code]:bg-surface grid gap-1.5 p-3 text-sm [&_code]:rounded-[3px] [&_code]:px-[5px] [&_code]:py-px [&_code]:font-mono [&_code]:text-[.8125rem] [&_code]:wrap-anywhere">
-        <span className={label}>Behind the scenes</span>
-        {/* sys strings are written by us in flows.js and only contain <code> tags */}
-        <p dangerouslySetInnerHTML={{ __html: st.sys }} />
-        <span className="text-primary font-mono text-[.75rem]">{st.who}</span>
+      <div className="grid gap-1">
+        <h2 className="text-lg">{st.title}</h2>
+        <p className="text-ink-2 text-sm">{st.actor}</p>
       </div>
-      <div className="flex flex-wrap items-center justify-between gap-3">
+      <p>{st.say}</p>
+      <details className="rounded-ab-sm bg-mist [&_code]:bg-surface [&_code]:font-code px-4 py-3 text-sm [&_code]:rounded-[3px] [&_code]:px-1 [&_code]:text-[0.8125rem] [&_code]:wrap-anywhere">
+        <summary className="cursor-pointer font-semibold">What the system does</summary>
+        {/* sys strings are written by us in flows.js and only contain <code> tags */}
+        <p className="mt-2" dangerouslySetInnerHTML={{ __html: st.sys }} />
+        <p className="text-ink-2 mt-2">Built by: {st.who}</p>
+      </details>
+      <div className="flex flex-wrap items-center justify-between gap-3 pt-1">
         <Button variant="secondary" size="sm" onClick={back} disabled={tour.i === 0}>
           Back
         </Button>
-        <div className="flex flex-wrap items-center gap-1.5">
+        <div className="flex flex-wrap items-center gap-3">
           <Button variant="quiet" size="sm" onClick={() => exit()}>
-            Exit
+            Exit demo
           </Button>
           <Button size="sm" onClick={next}>
             {tour.i === n - 1 ? 'Finish' : 'Next step'}

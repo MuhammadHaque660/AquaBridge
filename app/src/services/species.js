@@ -4,6 +4,7 @@
  */
 export const SPECIES = {
   'SP-001': {
+    plural: 'fancy goldfish',
     common: 'Fancy goldfish',
     sci: 'Carassius auratus',
     kind: 'animal',
@@ -18,6 +19,7 @@ export const SPECIES = {
     care: 'Coldwater fish that produce a lot of waste. Needs strong filtration and weekly partial water changes. Fancy varieties do better indoors than in ponds.',
   },
   'SP-002': {
+    plural: 'neon tetras',
     common: 'Neon tetra',
     sci: 'Paracheirodon innesi',
     kind: 'animal',
@@ -32,6 +34,7 @@ export const SPECIES = {
     care: 'Shoaling fish. Keep in groups of six or more in a heated, planted tank with soft water.',
   },
   'SP-003': {
+    plural: 'cherry shrimp',
     common: 'Cherry shrimp',
     sci: 'Neocaridina davidi',
     kind: 'animal',
@@ -46,6 +49,7 @@ export const SPECIES = {
     care: 'Peaceful and hardy. Sensitive to copper-based medicines and to sudden changes in water chemistry.',
   },
   'SP-004': {
+    plural: 'White Cloud Mountain minnows',
     common: 'White Cloud Mountain minnow',
     sci: 'Tanichthys albonubes',
     kind: 'animal',
@@ -60,6 +64,7 @@ export const SPECIES = {
     care: 'Coldwater shoaling fish. Does not need a heater in most UK homes. Keep in groups of six or more.',
   },
   'SP-005': {
+    plural: 'Java ferns',
     common: 'Java fern',
     sci: 'Microsorum pteropus',
     kind: 'plant',
@@ -73,6 +78,7 @@ export const SPECIES = {
     care: 'Slow-growing. Tie the rhizome to wood or rock; burying it in gravel causes rot.',
   },
   'SP-006': {
+    plural: 'hornwort plants',
     common: 'Hornwort',
     sci: 'Ceratophyllum demersum',
     kind: 'plant',
@@ -86,6 +92,7 @@ export const SPECIES = {
     care: 'Native to the UK. Fast-growing oxygenator that can float or be anchored.',
   },
   'SP-007': {
+    plural: 'hardy water lilies',
     common: 'Hardy water lily',
     sci: 'Nymphaea (hardy cultivars)',
     kind: 'plant',
@@ -100,6 +107,7 @@ export const SPECIES = {
     care: 'Pond only. Plant in an aquatic basket 30 to 90 cm deep, in full sun.',
   },
   'SP-008': {
+    plural: 'red-eared sliders',
     common: 'Red-eared slider',
     sci: 'Trachemys scripta elegans',
     kind: 'animal',
@@ -108,6 +116,7 @@ export const SPECIES = {
     care: 'Example restricted species. Listed as an invasive species of special concern in England and Wales; selling, exchanging and releasing it are restricted.',
   },
   'SP-009': {
+    plural: "parrot's feather plants",
     common: "Parrot's feather",
     sci: 'Myriophyllum aquaticum',
     kind: 'plant',
@@ -116,6 +125,7 @@ export const SPECIES = {
     care: 'Example restricted species. Listed as an invasive non-native plant in England and Wales and banned from sale.',
   },
   'SP-000': {
+    plural: 'unidentified animals or plants',
     common: "I'm not sure what it is",
     sci: 'Unidentified',
     kind: 'any',
@@ -126,6 +136,10 @@ export const SPECIES = {
 };
 
 export const getSpecies = (id) => SPECIES[id];
+
+/** A suggested listing title: "Neon tetra needs a new home" or "6 neon tetras need a new home". */
+export const suggestTitle = (s, n) =>
+  +n === 1 ? `${s.common} needs a new home` : `${n} ${s.plural || s.common.toLowerCase()} need a new home`;
 
 /** Species a user can pick for a given kind ('animal' | 'plant'), including the "not sure" option. */
 export const listSpecies = (kind) =>

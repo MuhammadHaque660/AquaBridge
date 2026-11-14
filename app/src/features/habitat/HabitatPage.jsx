@@ -1,14 +1,14 @@
 import { useState } from 'react';
-import { Link, useNavigate, useParams } from 'react-router';
+import { useNavigate, useParams } from 'react-router';
 import { to } from '../../routes';
 import { byId } from '../../services/seed';
 import { useStore } from '../../services/store';
 import { Button } from '../../shared/components/Button';
 import { Chip } from '../../shared/components/Chip';
-import { Empty, PageHead } from '../../shared/components/Feedback';
-import { Choice, Field } from '../../shared/components/Form';
-import { focusFirstError, useGo, useUi } from '../../shared/hooks';
-import { choices, cx, formFoot, formGrid, mono, page, panel, stack } from '../../shared/styles';
+import { BackLink, Empty, PageHead } from '../../shared/components/Feedback';
+import { Choice, ErrorSummary, Field } from '../../shared/components/Form';
+import { useGo, useUi } from '../../shared/hooks';
+import { choices, cx, formFoot, formGrid, page, panel } from '../../shared/styles';
 import { missingCount, normaliseHabitat, validateHabitat } from './compat';
 import { HabitatSummary } from './HabitatSummary';
 
@@ -26,8 +26,9 @@ const BLANK = {
   light: 'medium',
   inhabitants: '',
 };
+const ERROR_IDS = { name: 'hname' };
 
-/** Habitat profile form (M-01). Opened from My Habitat or from a compatibility check (then saving returns there). */
+/** Habitat profile form (M-01). Opened from My tanks and ponds or from a compatibility check (then saving returns there). */
 function HabitatForm({ edit }) {
   const { state, update, toast } = useStore();
   const navigate = useNavigate();
@@ -41,9 +42,9 @@ function HabitatForm({ edit }) {
   if (edit !== 'new' && !existing)
     return (
       <div className={page}>
-        <Empty title="That habitat could not be found.">
+        <Empty title="We could not find that tank or pond.">
           <Button to="/account/habitat" variant="secondary">
-            Back to My Habitat
+            Go to my tanks and ponds
           </Button>
         </Empty>
       </div>
@@ -63,7 +64,7 @@ function HabitatForm({ edit }) {
     const d = normaliseHabitat({ ...h, name: h.name.trim(), inhabitants: h.inhabitants.trim() });
     const err = validateHabitat(d);
     setErrors(err);
-    if (Object.keys(err).length) return focusFirstError();
+    if (Object.keys(err).length) return;
     const id = update((s) => {
       if (!d.id) {
         d.id = 'H-' + s.seq.habitat++;
@@ -72,14 +73,14 @@ function HabitatForm({ edit }) {
       s.returnTo = null;
       return d.id;
     });
-    toast('Habitat saved');
+    toast(`${d.name} saved`);
     if (back) go('compat', { id: back }, { hab: id });
     else navigate('/account/habitat');
   };
   const yn = (name, title, opts) => (
-    <Field id={name} label={title}>
+    <Field id={name} label={title} optional>
       <select id={name} value={h[name]} onChange={set(name)}>
-        <option value="">Not sure / not set</option>
+        <option value="">Not sure</option>
         {opts.map(([v, t]) => (
           <option key={v} value={v}>
             {t}
@@ -89,107 +90,148 @@ function HabitatForm({ edit }) {
     </Field>
   );
   const phField = (
-    <Field id="ph" label="pH" error={errors.ph}>
-      <input type="number" id="ph" step="0.1" value={h.ph} onChange={set('ph')} data-tour="habitat-ph" />
-    </Field>
-  );
-  const crumbLink = (
-    <Link
-      to="/account/habitat"
-      onClick={(e) => {
-        e.preventDefault();
-        cancel();
-      }}
+    <Field
+      id="ph"
+      label="pH"
+      optional
+      hint="Usually between 6 and 8. A liquid test kit is more reliable than strips."
+      error={errors.ph}
     >
-      ← My Habitat
-    </Link>
+      <input
+        type="number"
+        id="ph"
+        step="0.1"
+        inputMode="decimal"
+        value={h.ph}
+        onChange={set('ph')}
+        data-tour="habitat-ph"
+        className="max-w-40"
+      />
+    </Field>
   );
 
   return (
-    <div className={cx(page, 'max-w-[820px]')}>
-      <PageHead title={h.id ? 'Edit habitat' : 'Add a habitat'} crumb={crumbLink}>
-        Fill in what you know. Gaps are fine; the compatibility check will tell you what’s missing.
+    <div className={cx(page, 'max-w-3xl')}>
+      <PageHead
+        title={h.id ? `Edit ${existing?.name || 'tank or pond'}` : 'Add a tank or pond'}
+        crumb={
+          <BackLink
+            href="/account/habitat"
+            onClick={(e) => {
+              e.preventDefault();
+              cancel();
+            }}
+          >
+            {back ? 'Back to the compatibility check' : 'Back to my tanks and ponds'}
+          </BackLink>
+        }
+      >
+        Fill in what you know. You can leave gaps; the compatibility check tells you what is missing.
       </PageHead>
-      <form className={cx(panel, stack)} noValidate onSubmit={submit}>
+      <ErrorSummary errors={errors} ids={ERROR_IDS} />
+      <form noValidate onSubmit={submit} className="grid gap-8">
+        <Field id="hname" label="Name" hint="Only you see this, for example “Living room tank”." error={errors.name}>
+          <input type="text" id="hname" value={h.name} onChange={set('name')} className="max-w-md" />
+        </Field>
+        <Field legend="Is it an aquarium or a pond?">
+          <div className={choices}>
+            <Choice
+              name="type"
+              value="aquarium"
+              checked={h.type === 'aquarium'}
+              onChange={(v) => setH({ ...h, type: v })}
+              title="Aquarium"
+              sub="An indoor tank"
+            />
+            <Choice
+              name="type"
+              value="pond"
+              checked={h.type === 'pond'}
+              onChange={(v) => setH({ ...h, type: v })}
+              title="Pond"
+              sub="An outdoor pond"
+            />
+          </div>
+        </Field>
         <div className={formGrid}>
-          <Field id="hname" label="Name" required full hint="Only you see this name." error={errors.name}>
-            <input type="text" id="hname" value={h.name} onChange={set('name')} placeholder="e.g. Living room tank" />
-          </Field>
-          <Field legend="Type" full>
-            <div className={choices}>
-              <Choice
-                name="type"
-                value="aquarium"
-                checked={h.type === 'aquarium'}
-                onChange={(v) => setH({ ...h, type: v })}
-                title="Aquarium"
-                sub="Indoor tank"
-              />
-              <Choice
-                name="type"
-                value="pond"
-                checked={h.type === 'pond'}
-                onChange={(v) => setH({ ...h, type: v })}
-                title="Pond"
-                sub="Outdoor pond"
-              />
-            </div>
-          </Field>
-          <Field id="volume" label="Volume (litres)" error={errors.volume}>
-            <input type="number" id="volume" min="5" value={h.volume} onChange={set('volume')} />
+          <Field id="volume" label="Volume in litres" optional error={errors.volume}>
+            <input
+              type="number"
+              id="volume"
+              min="5"
+              inputMode="numeric"
+              value={h.volume}
+              onChange={set('volume')}
+              className="max-w-40"
+            />
           </Field>
           {h.type === 'pond' ? (
-            <Field id="depth" label="Deepest point (cm)">
-              <input type="number" id="depth" value={h.depth} onChange={set('depth')} />
+            <Field id="depth" label="Deepest point in cm" optional>
+              <input
+                type="number"
+                id="depth"
+                inputMode="numeric"
+                value={h.depth}
+                onChange={set('depth')}
+                className="max-w-40"
+              />
             </Field>
           ) : (
             phField
           )}
-          <Field id="tempMin" label="Lowest temperature (°C)" error={errors.tempMin}>
-            <input type="number" id="tempMin" value={h.tempMin} onChange={set('tempMin')} />
+          <Field id="tempMin" label="Lowest water temperature in °C" optional error={errors.tempMin}>
+            <input
+              type="number"
+              id="tempMin"
+              inputMode="decimal"
+              value={h.tempMin}
+              onChange={set('tempMin')}
+              className="max-w-40"
+            />
           </Field>
-          <Field id="tempMax" label="Highest temperature (°C)" error={errors.tempMax}>
-            <input type="number" id="tempMax" value={h.tempMax} onChange={set('tempMax')} />
+          <Field id="tempMax" label="Highest water temperature in °C" optional error={errors.tempMax}>
+            <input
+              type="number"
+              id="tempMax"
+              inputMode="decimal"
+              value={h.tempMax}
+              onChange={set('tempMax')}
+              className="max-w-40"
+            />
           </Field>
           {h.type === 'pond' && phField}
-          {yn('filter', 'Filter running?', [
+          {yn('filter', 'Is a filter running?', [
             ['yes', 'Yes'],
             ['no', 'No'],
           ])}
-          {yn('cycled', 'Filter cycled?', [
+          {yn('cycled', 'Is the filter cycled?', [
             ['yes', 'Yes'],
             ['no', 'No'],
             ['unsure', 'Not sure'],
           ])}
-          <Field id="light" label="Lighting">
+          <Field id="light" label="Lighting" optional>
             <select id="light" value={h.light} onChange={set('light')}>
-              {['low', 'medium', 'high'].map((v) => (
-                <option key={v}>{v}</option>
-              ))}
+              <option value="low">Low</option>
+              <option value="medium">Medium</option>
+              <option value="high">High</option>
             </select>
           </Field>
-          <Field id="inh" label="What already lives there?" full>
-            <input
-              type="text"
-              id="inh"
-              value={h.inhabitants}
-              onChange={set('inhabitants')}
-              placeholder="e.g. 6 rasboras, 2 snails"
-            />
+          <Field id="inh" label="What already lives there?" optional hint="For example “6 rasboras, 2 snails”." full>
+            <input type="text" id="inh" value={h.inhabitants} onChange={set('inhabitants')} />
           </Field>
         </div>
         <div className={cx(formFoot, 'mt-0')}>
-          <Button variant="secondary" onClick={cancel}>
+          <Button type="submit">{back ? 'Save and return to the check' : 'Save'}</Button>
+          <Button variant="quiet" onClick={cancel}>
             Cancel
           </Button>
-          <Button type="submit">Save habitat{back ? ' and return to check' : ''}</Button>
         </div>
       </form>
     </div>
   );
 }
 
-/** My Habitat (M-02): saved tanks and ponds, reused across compatibility checks. Requires login. */
+/** My tanks and ponds (M-02): saved habitats, reused across compatibility checks. Requires login. */
 export function HabitatPage() {
   const { edit } = useParams();
   const { state, update } = useStore();
@@ -204,33 +246,30 @@ export function HabitatPage() {
   };
   return (
     <div className={page}>
-      <PageHead title="My Habitat" actions={<Button onClick={add}>Add a habitat</Button>}>
-        Save each tank or pond once and reuse it whenever you check a listing.
+      <PageHead title="My tanks and ponds" actions={<Button onClick={add}>Add a tank or pond</Button>}>
+        Save each tank or pond once, then use it whenever you check whether a listing suits you.
       </PageHead>
       {mine.length ? (
-        <div className="grid grid-cols-[repeat(auto-fill,minmax(280px,1fr))] gap-4">
+        <div className="grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-6">
           {mine.map((h) => {
             const missing = missingCount(h);
             return (
-              <article key={h.id} className="rounded-ab border-line bg-surface grid gap-3 border px-6 py-4">
-                <div className="flex flex-wrap items-center justify-between gap-3">
-                  <h3>{h.name}</h3>
-                  <span className={cx(mono, 'text-ink-2')}>{h.id}</span>
-                </div>
-                <div className="flex flex-wrap items-center gap-3">
-                  <Chip tone="pri" plain>
-                    {h.type}
-                  </Chip>
-                  {missing ? (
-                    <Chip tone="warn">{`${missing} detail${missing > 1 ? 's' : ''} missing`}</Chip>
-                  ) : (
-                    <Chip tone="ok">complete</Chip>
-                  )}
+              <article key={h.id} className={cx(panel, 'grid content-start gap-4')}>
+                <div className="grid gap-2">
+                  <h2 className="text-lg">{h.name}</h2>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <Chip tone="pri">{h.type === 'pond' ? 'Pond' : 'Aquarium'}</Chip>
+                    {missing ? (
+                      <Chip tone="warn">{`${missing} detail${missing > 1 ? 's' : ''} missing`}</Chip>
+                    ) : (
+                      <Chip tone="ok">Complete</Chip>
+                    )}
+                  </div>
                 </div>
                 <HabitatSummary habitat={h} />
                 <div>
                   <Button variant="secondary" size="sm" onClick={() => go('habitat', { edit: h.id })}>
-                    Edit
+                    Edit<span className="sr-only"> {h.name}</span>
                   </Button>
                 </div>
               </article>
@@ -238,9 +277,9 @@ export function HabitatPage() {
           })}
         </div>
       ) : (
-        <Empty title="No habitats yet.">
+        <Empty title="You have not added a tank or pond yet.">
           <Button size="sm" onClick={add}>
-            Add your first habitat
+            Add a tank or pond
           </Button>
         </Empty>
       )}

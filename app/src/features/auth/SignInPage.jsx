@@ -1,11 +1,11 @@
 import { useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router';
+import { Link, useNavigate, useSearchParams } from 'react-router';
 import { ME } from '../../services/contracts';
 import { useStore } from '../../services/store';
 import { Button } from '../../shared/components/Button';
-import { Notice, PageHead } from '../../shared/components/Feedback';
-import { Field, Tabs } from '../../shared/components/Form';
-import { cx, label, page, stack } from '../../shared/styles';
+import { Notice } from '../../shared/components/Feedback';
+import { Field } from '../../shared/components/Form';
+import { cx, page } from '../../shared/styles';
 
 /**
  * Sign in checkpoint (SH-05). Mock authentication: any submit signs in the sample user and returns to the saved action.
@@ -17,6 +17,7 @@ export function SignInPage() {
   const [search] = useSearchParams();
   const [tab, setTab] = useState(search.get('tab') === 'register' ? 'register' : 'login');
   const p = state.pending;
+  const login = tab === 'login';
 
   const submit = (e) => {
     e.preventDefault();
@@ -27,10 +28,15 @@ export function SignInPage() {
     toast('Signed in as Jordan Lee (sample user)');
     navigate(p?.to || '/account/listings');
   };
+  const switchTo = (t) => (e) => {
+    e.preventDefault();
+    setTab(t);
+  };
 
   return (
-    <div className={cx(page, 'max-w-[520px]')}>
-      <PageHead title={tab === 'login' ? 'Log in to continue' : 'Create your account'}>
+    <div className={cx(page, 'max-w-[600px]')}>
+      <div className="mb-8 grid gap-4">
+        <h1>{login ? 'Sign in' : 'Create an account'}</h1>
         {p ? (
           <Notice tone="pri" title={`You’ll go back to: ${p.label}`} data-tour="return-notice">
             {p.name === 'editor'
@@ -38,36 +44,47 @@ export function SignInPage() {
               : 'Anything you entered is kept.'}
           </Notice>
         ) : (
-          <p className="text-ink-2">One account lets you rehome and adopt.</p>
+          <p className="text-md text-ink-2">One account lets you rehome and adopt.</p>
         )}
-      </PageHead>
-      <Tabs
-        value={tab}
-        onChange={setTab}
-        tabs={[
-          ['login', 'Log in'],
-          ['register', 'Sign up'],
-        ]}
-      />
-      <form className={stack} noValidate onSubmit={submit}>
-        {tab === 'register' && (
-          <Field id="name" label="Your name">
+      </div>
+      <form className="grid gap-6" noValidate onSubmit={submit}>
+        {!login && (
+          <Field id="name" label="Full name">
             <input type="text" id="name" defaultValue="Jordan Lee" autoComplete="off" />
           </Field>
         )}
-        <Field id="email" label="Email">
-          <input type="email" id="email" defaultValue="jordan.lee@example.com" autoComplete="off" />
+        <Field id="email" label="Email address">
+          <input type="email" id="email" defaultValue="jordan.lee@example.com" autoComplete="off" spellCheck={false} />
         </Field>
         <Field id="pw" label="Password">
           <input type="password" id="pw" defaultValue="sample-only" autoComplete="off" />
         </Field>
-        <Button type="submit">{tab === 'login' ? 'Log in' : 'Create account'} as sample user</Button>
+        <div>
+          <Button type="submit">{login ? 'Sign in' : 'Create account'} as the sample user</Button>
+        </div>
       </form>
-      <div className="rounded-ab border-warn bg-warn-soft mt-6 grid gap-2 border border-dashed px-4 py-3 text-sm">
-        <span className={cx(label, 'text-warn')}>Prototype note</span>
+      <p className="mt-6">
+        {login ? (
+          <>
+            No account?{' '}
+            <Link to="/signin?tab=register" onClick={switchTo('register')}>
+              Create one
+            </Link>
+          </>
+        ) : (
+          <>
+            Already have an account?{' '}
+            <Link to="/signin" onClick={switchTo('login')}>
+              Sign in
+            </Link>
+          </>
+        )}
+      </p>
+      <div className="rounded-ab border-warn/60 mt-10 grid gap-1 border-2 border-dashed px-4 py-3 text-sm">
+        <span className="text-warn font-semibold">Prototype only</span>
         <span>
-          The university-provided login component replaces this form. Any submit signs in the sample user Jordan Lee
-          (U-01) and returns to the saved action.
+          The university-provided login replaces this form. Any submit signs in the sample user Jordan Lee and returns
+          to where you were going.
         </span>
       </div>
     </div>

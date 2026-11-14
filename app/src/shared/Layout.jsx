@@ -6,27 +6,20 @@ import { listForOwner } from '../services/requestService';
 import { seed } from '../services/seed';
 import { useStore } from '../services/store';
 import { useTour } from '../reference/tour';
-import { Logo, Chevron } from './components/Art';
+import { Chevron, Logo } from './components/Art';
 import { Toast } from './components/Feedback';
 import { cx, wrap } from './styles';
 
 const NAV_LINK =
-  'rounded-ab-sm px-3.5 py-2.5 font-display text-[1.0625rem] font-medium text-ink no-underline hover:bg-surface-2 hover:text-ink max-lg:p-3 ' +
-  'aria-[current=page]:rounded-none aria-[current=page]:text-primary aria-[current=page]:shadow-[inset_0_-3px_0_var(--color-primary)] ' +
-  'max-lg:aria-[current=page]:bg-primary-soft max-lg:aria-[current=page]:shadow-[inset_3px_0_0_var(--color-primary)]';
+  'relative flex min-h-16 items-center px-3 text-md font-semibold text-ink no-underline hover:text-primary hover:underline ' +
+  "aria-[current=page]:text-primary aria-[current=page]:after:absolute aria-[current=page]:after:inset-x-3 aria-[current=page]:after:bottom-0 aria-[current=page]:after:h-1 aria-[current=page]:after:bg-primary aria-[current=page]:after:content-[''] " +
+  'max-lg:min-h-12 max-lg:px-0 max-lg:aria-[current=page]:after:hidden max-lg:aria-[current=page]:underline';
 const DD_ITEM =
-  'flex w-full items-center justify-between gap-2 rounded-ab-sm px-3 py-2.5 text-left text-md text-ink no-underline hover:bg-surface-2 hover:text-ink ' +
-  'aria-[current=page]:bg-primary-soft aria-[current=page]:font-bold aria-[current=page]:text-primary';
-const BADGE =
-  'h-[22px] min-w-[22px] rounded-[11px] bg-warn px-[7px] text-center font-mono text-[0.75rem] leading-[22px] font-medium text-white';
+  'flex w-full items-center justify-between gap-3 rounded-ab-sm px-3 py-2.5 text-left text-md text-ink no-underline hover:bg-mist hover:text-ink ' +
+  'aria-[current=page]:font-semibold aria-[current=page]:text-primary max-lg:px-0';
+const BADGE = 'min-w-6 rounded-full bg-bad px-1.5 text-center text-xs leading-6 font-bold text-white tabular-nums';
 
-const initials = (name) =>
-  name
-    .split(' ')
-    .map((p) => p[0])
-    .join('');
-
-/** Header (SH-04): three main links, and an account menu grouped into Rehoming and Adopting. */
+/** Header (SH-04): logo, three main links, and an account menu grouped into Rehoming and Adopting. */
 function Header() {
   const { state, update, toast } = useStore();
   const loc = useLocation();
@@ -43,7 +36,6 @@ function Header() {
 
   const user = state.user && USERS[state.user];
   const pendingCount = state.user ? listForOwner(state, state.user).filter((r) => r.status === 'pending').length : 0;
-  const inAccount = ['mylistings', 'incoming', 'habitat', 'myrequests'].includes(name);
 
   useEffect(() => {
     if (!navOpen && !acctOpen) return;
@@ -70,18 +62,15 @@ function Header() {
   };
   const current = (n) =>
     name === n ||
-    (n === 'browse' && ['listing', 'compat', 'request'].includes(name)) ||
+    (n === 'browse' && ['listing', 'compat', 'request', 'sent'].includes(name)) ||
     (n === 'rehome' && ['review', 'guidance', 'editor'].includes(name))
       ? 'page'
       : undefined;
-  const ddLink = (n, title, hint, badge) => (
+  const ddLink = (n, title, badge) => (
     <Link to={to(n)} className={DD_ITEM} aria-current={name === n ? 'page' : undefined} data-dd-item>
-      <span>
-        {title}
-        <small className="text-ink-2 block text-xs font-normal">{hint}</small>
-      </span>
+      <span>{title}</span>
       {badge ? (
-        <span className={BADGE} aria-label={`${badge} waiting`}>
+        <span className={BADGE} aria-label={`${badge} new`}>
           {badge}
         </span>
       ) : null}
@@ -92,7 +81,7 @@ function Header() {
       s.user = null;
     });
     navigate('/');
-    toast('Signed out');
+    toast('You have signed out');
   };
   const clearPending = () =>
     update((s) => {
@@ -100,11 +89,11 @@ function Header() {
     });
 
   return (
-    <header className="border-line bg-surface sticky top-[env(safe-area-inset-top,0px)] z-20 border-b">
-      <div className={cx(wrap, 'relative flex min-h-16 items-center gap-6')}>
+    <header className="border-line bg-surface sticky top-0 z-20 border-b">
+      <div className={cx(wrap, 'relative flex min-h-16 items-center gap-8')}>
         <Link
           to="/"
-          className="font-display text-ink hover:text-ink flex items-center gap-2.5 text-[1.375rem] font-bold tracking-[-0.02em] no-underline"
+          className="text-ink hover:text-ink flex items-center gap-2.5 text-xl font-bold tracking-[-0.01em] no-underline"
         >
           <Logo />
           AquaBridge
@@ -113,23 +102,23 @@ function Header() {
           id="nav"
           aria-label="Main"
           className={cx(
-            'flex flex-1 items-center gap-6',
-            'max-lg:border-line max-lg:bg-surface max-lg:absolute max-lg:inset-x-0 max-lg:top-full max-lg:flex-col max-lg:items-stretch max-lg:gap-2 max-lg:border-b max-lg:px-4 max-lg:pt-2 max-lg:pb-4 max-lg:shadow-[0_14px_30px_rgba(18,50,74,.12)]',
+            'flex flex-1 items-center gap-2',
+            'max-lg:border-line max-lg:bg-surface max-lg:shadow-card max-lg:absolute max-lg:inset-x-0 max-lg:top-full max-lg:flex-col max-lg:items-stretch max-lg:gap-0 max-lg:border-b max-lg:px-6 max-lg:pb-4',
             !navOpen && 'max-lg:hidden',
           )}
         >
-          <div className="flex items-center gap-1 max-lg:flex-col max-lg:items-stretch">
+          <div className="flex items-center max-lg:flex-col max-lg:items-stretch">
             <Link to="/browse" className={NAV_LINK} aria-current={current('browse')}>
               Browse listings
             </Link>
             <Link to="/rehome" className={NAV_LINK} aria-current={current('rehome')}>
               Rehome
             </Link>
-            <Link to="/#how" className={NAV_LINK}>
+            <Link to="/how-it-works" className={NAV_LINK} aria-current={current('help')}>
               How it works
             </Link>
           </div>
-          <div className="max-lg:border-line ml-auto flex items-center gap-2 max-lg:ml-0 max-lg:flex-col max-lg:items-stretch max-lg:border-t max-lg:pt-3">
+          <div className="max-lg:border-line ml-auto flex items-center gap-4 max-lg:ml-0 max-lg:flex-col max-lg:items-stretch max-lg:gap-0 max-lg:border-t max-lg:pt-2">
             {user ? (
               <div className="relative" ref={ddRef}>
                 <button
@@ -138,20 +127,11 @@ function Header() {
                   onClick={toggleAcct}
                   aria-expanded={acctOpen}
                   aria-controls="acctPanel"
-                  className={cx(
-                    'group bg-surface font-display text-md text-ink hover:border-ink-2 aria-expanded:border-ink-2 flex items-center gap-2.5 rounded-full border py-1 pr-3.5 pl-1 font-medium max-lg:hidden',
-                    inAccount ? 'border-primary' : 'border-line',
-                  )}
+                  className="group rounded-ab-sm text-md text-ink hover:bg-mist flex min-h-11 items-center gap-2 px-2 font-semibold max-lg:hidden"
                 >
-                  <span
-                    className="bg-primary-soft font-display text-primary grid size-8 flex-none place-items-center rounded-full text-[0.875rem] font-bold"
-                    aria-hidden="true"
-                  >
-                    {initials(user.name)}
-                  </span>
-                  <span>My account</span>
+                  <span>Your account</span>
                   {pendingCount ? (
-                    <span className={BADGE} aria-label={`${pendingCount} requests waiting`}>
+                    <span className={BADGE} aria-label={`${pendingCount} new requests`}>
                       {pendingCount}
                     </span>
                   ) : null}
@@ -160,49 +140,40 @@ function Header() {
                 <div
                   id="acctPanel"
                   className={cx(
-                    'rounded-ab border-line bg-surface absolute top-[calc(100%+10px)] right-0 z-30 w-[280px] border p-2 shadow-[0_14px_36px_rgba(18,50,74,.14)]',
+                    'rounded-ab border-line bg-surface shadow-card absolute top-[calc(100%+8px)] right-0 z-30 w-72 border p-2',
                     'max-lg:static max-lg:grid max-lg:w-auto max-lg:border-0 max-lg:p-0 max-lg:shadow-none',
                     acctOpen ? 'grid' : 'hidden',
                   )}
                 >
-                  <div className="border-line text-ink-2 border-b px-3 pt-2 pb-3 text-sm">
-                    <strong className="font-display text-ink block text-[1.0625rem] font-semibold">{user.name}</strong>
-                    Sample account
+                  <p className="text-ink-2 px-3 pt-2 pb-2 text-sm max-lg:px-0">
+                    Signed in as <strong className="text-ink">{user.name}</strong>
+                  </p>
+                  <p className="text-ink-2 px-3 pt-2 text-xs font-semibold max-lg:px-0">Rehoming</p>
+                  {ddLink('mylistings', 'My listings')}
+                  {ddLink('incoming', 'Requests for my listings', pendingCount)}
+                  <p className="border-line text-ink-2 mt-2 border-t px-3 pt-3 text-xs font-semibold max-lg:px-0">
+                    Adopting
+                  </p>
+                  {ddLink('habitat', 'My tanks and ponds')}
+                  {ddLink('myrequests', 'My adoption requests')}
+                  <div className="border-line mt-2 border-t pt-2">
+                    <button type="button" className={DD_ITEM} onClick={signOut}>
+                      Sign out
+                    </button>
                   </div>
-                  <div className="border-line grid border-b py-2">
-                    <span className="text-ink-2 px-3 pt-1.5 pb-1 font-mono text-[0.75rem] tracking-[.1em] uppercase">
-                      Rehoming
-                    </span>
-                    {ddLink('mylistings', 'My Listings', 'Drafts, live and rehomed')}
-                    {ddLink('incoming', 'Incoming requests', 'Adopters asking for yours', pendingCount)}
-                  </div>
-                  <div className="border-line grid border-b py-2">
-                    <span className="text-ink-2 px-3 pt-1.5 pb-1 font-mono text-[0.75rem] tracking-[.1em] uppercase">
-                      Adopting
-                    </span>
-                    {ddLink('habitat', 'My Habitat', 'Your saved tanks and ponds')}
-                    {ddLink('myrequests', 'My Requests', 'Requests you have sent')}
-                  </div>
-                  <button type="button" className={cx(DD_ITEM, 'text-ink-2 mt-1')} onClick={signOut}>
-                    Sign out
-                  </button>
                 </div>
               </div>
             ) : (
               <>
-                <Link
-                  to="/signin"
-                  onClick={clearPending}
-                  className="rounded-ab text-md text-ink hover:bg-primary-soft hover:text-ink inline-flex items-center px-2 py-[11px] leading-[1.2] font-bold no-underline"
-                >
-                  Log in
+                <Link to="/signin" onClick={clearPending} className={cx(NAV_LINK, 'px-0')}>
+                  Sign in
                 </Link>
                 <Link
                   to="/signin?tab=register"
                   onClick={clearPending}
-                  className="rounded-ab bg-primary text-md hover:bg-primary-hover inline-flex items-center justify-center px-3 py-[7px] leading-[1.2] font-bold text-white no-underline hover:text-white"
+                  className="rounded-ab-sm bg-primary hover:bg-primary-hover inline-flex min-h-11 items-center justify-center px-4 font-semibold text-white no-underline hover:text-white max-lg:my-2"
                 >
-                  Sign up
+                  Create an account
                 </Link>
               </>
             )}
@@ -215,9 +186,11 @@ function Header() {
             onClick={() => setNavFor(navOpen ? null : loc.key)}
             aria-expanded={navOpen}
             aria-controls="nav"
-            className="rounded-ab border-line bg-surface text-md text-ink hover:border-ink-2 inline-flex items-center border px-3 py-[7px] leading-[1.2] font-bold"
+            className="group rounded-ab-sm text-ink hover:bg-mist flex min-h-11 items-center gap-2 px-2 font-semibold"
           >
             {navOpen ? 'Close' : 'Menu'}
+            {pendingCount && !navOpen ? <span className={BADGE}>{pendingCount}</span> : null}
+            <Chevron />
           </button>
         </div>
       </div>
@@ -225,100 +198,171 @@ function Header() {
   );
 }
 
-/** Build notes strip: which screen this is, who builds it and which backlog items it covers. Prototype only. */
-function BuildNotes() {
-  const { state } = useStore();
+/**
+ * Prototype banner (GOV.UK "phase banner" pattern). Says plainly that this is a prototype with sample data, and holds the
+ * team notes toggle. The notes (screen owner, Sprint 1 tasks and stories) are off by default.
+ */
+function PrototypeBanner() {
+  const { state, update } = useStore();
   const { tour } = useTour();
   const r = ROUTES[routeName(useLocation().pathname)];
-  if (!state.notes) return null;
+  const toggle = () =>
+    update((s) => {
+      s.notes = !s.notes;
+    });
   return (
-    <div
-      className="border-line bg-surface-2 text-ink-2 [&_b]:text-ink border-b font-mono text-xs [&_b]:font-medium"
-      aria-label="Build notes"
-    >
-      <div className={cx(wrap, 'flex flex-wrap gap-x-6 gap-y-1.5 py-2')}>
-        <span>
-          SCREEN <b>{r.title}</b>
+    <div className="border-line bg-surface border-b">
+      <div className={cx(wrap, 'flex flex-wrap items-center gap-x-3 gap-y-1 py-2 text-sm')}>
+        <strong className="rounded-ab-sm bg-ink px-2 py-0.5 text-xs font-bold tracking-wide text-white">
+          PROTOTYPE
+        </strong>
+        <span className="text-ink-2">
+          Sample data only
+          <span className="max-sm:hidden">
+            . Guidance and compatibility results are examples, not legal or veterinary advice
+          </span>
+          .
         </span>
-        <span>
-          OWNER <b className="text-primary!">{r.owner}</b>
-        </span>
-        <span>
-          TASKS <b>{r.tasks}</b>
-        </span>
-        <span>
-          STORIES <b>{r.stories}</b>
-        </span>
-        <span>
-          LOGIN <b>{r.auth ? 'required' : 'not required'}</b>
-        </span>
-        {!tour && (
-          <Link to="/demos" className="ml-auto">
-            Watch the demo flows →
-          </Link>
-        )}
+        <button
+          type="button"
+          onClick={toggle}
+          aria-expanded={state.notes}
+          className="text-primary ml-auto underline underline-offset-3 hover:decoration-2"
+        >
+          {state.notes ? 'Hide team notes' : 'Team notes'}
+        </button>
       </div>
+      {state.notes && (
+        <div className="border-line bg-mist border-t" aria-label="Team notes">
+          <dl
+            className={cx(
+              wrap,
+              '[&_dt]:text-ink-2 m-0 flex flex-wrap gap-x-8 gap-y-1 py-2.5 text-sm [&_dd]:m-0 [&>div]:flex [&>div]:gap-1.5',
+            )}
+          >
+            <div>
+              <dt>Screen</dt>
+              <dd className="font-semibold">{r.title}</dd>
+            </div>
+            <div>
+              <dt>Built by</dt>
+              <dd className="text-primary font-semibold">{r.owner}</dd>
+            </div>
+            <div>
+              <dt>Tasks</dt>
+              <dd>{r.tasks}</dd>
+            </div>
+            <div>
+              <dt>Stories</dt>
+              <dd>{r.stories}</dd>
+            </div>
+            <div>
+              <dt>Login</dt>
+              <dd>{r.auth ? 'Required' : 'Not required'}</dd>
+            </div>
+            {!tour && (
+              <div className="ml-auto">
+                <dd>
+                  <Link to="/demos">Watch the demo flows</Link>
+                </dd>
+              </div>
+            )}
+          </dl>
+        </div>
+      )}
     </div>
   );
 }
 
-const FOOT_LINK = 'text-primary underline underline-offset-3 hover:text-primary-hover';
+const FOOT_LINK = 'text-left text-ink underline underline-offset-3 hover:text-ink hover:decoration-2';
 
 function Footer() {
-  const { state, update, replace, toast } = useStore();
+  const { replace, toast } = useStore();
   const { exit } = useTour();
   const navigate = useNavigate();
   const reset = () => {
     exit(false);
     replace((cur) => ({ ...seed(), notes: cur.notes }));
     navigate('/');
-    toast('Sample data reset');
+    toast('Sample data has been reset');
   };
+  const group = (title, links) => (
+    <nav aria-label={title} className="grid content-start gap-2">
+      <h2 className="text-md">{title}</h2>
+      <ul className="m-0 grid list-none gap-2 p-0">
+        {links.map(([text, target]) => (
+          <li key={text}>
+            {typeof target === 'function' ? (
+              <button type="button" className={FOOT_LINK} onClick={target}>
+                {text}
+              </button>
+            ) : (
+              <Link to={target} className={FOOT_LINK}>
+                {text}
+              </Link>
+            )}
+          </li>
+        ))}
+      </ul>
+    </nav>
+  );
   return (
-    <footer className="border-line bg-surface text-ink-2 border-t text-sm">
-      <div className={cx(wrap, 'flex flex-wrap justify-between gap-x-8 gap-y-4 py-6')}>
-        <div className="grid gap-1">
-          <strong className="text-ink">AquaBridge Sprint 1 prototype</strong>
-          <span>
-            Uses sample data only. Guidance and compatibility results are illustrative, not legal or biological advice.
-          </span>
+    <footer className="border-primary bg-mist mt-auto border-t-4 text-sm">
+      <div
+        className={cx(
+          wrap,
+          'grid grid-cols-[minmax(0,1.4fr)_repeat(3,minmax(0,1fr))] gap-10 py-12 max-lg:grid-cols-2 max-sm:grid-cols-1',
+        )}
+      >
+        <div className="grid content-start gap-3">
+          <p className="flex items-center gap-2 text-lg font-bold">
+            <Logo />
+            AquaBridge
+          </p>
+          <p className="text-ink-2 max-w-[40ch]">
+            Free rehoming for aquarium and pond fish, shrimp and plants in the UK, so they go to a suitable new home
+            instead of being released.
+          </p>
         </div>
-        <nav aria-label="Prototype tools" className="flex flex-wrap gap-4">
-          <Link to="/demos">Demo flows</Link>
-          <Link to="/map">Screen map</Link>
-          <Link to="/design">Design system</Link>
-          <button
-            type="button"
-            className={FOOT_LINK}
-            onClick={() =>
-              update((s) => {
-                s.notes = !s.notes;
-              })
-            }
-          >
-            {state.notes ? 'Hide build notes' : 'Show build notes'}
-          </button>
-          <button type="button" className={FOOT_LINK} onClick={reset}>
-            Reset sample data
-          </button>
-        </nav>
+        {group('Using AquaBridge', [
+          ['Browse listings', '/browse'],
+          ['Rehome an animal or plant', '/rehome'],
+          ['How it works', '/how-it-works'],
+          ['Never release them', '/how-it-works#never-release'],
+        ])}
+        {group('About', [
+          ['Accessibility', '/accessibility'],
+          ['Privacy', '/privacy'],
+          ['Contact', '/contact'],
+        ])}
+        {group('Team tools', [
+          ['Demo flows', '/demos'],
+          ['Screen map', '/map'],
+          ['Design system', '/design'],
+          ['Reset sample data', reset],
+        ])}
+      </div>
+      <div className="border-line border-t">
+        <p className={cx(wrap, 'text-ink-2 py-4')}>CS2701 Group B14 · Sprint 1 prototype · Sample data only</p>
       </div>
     </footer>
   );
 }
 
-/** Page frame: header, build notes, the current screen, footer, toast. Focus moves to the new screen on navigation. */
+/** Page frame: header, prototype banner, the current screen, footer, toast. Focus moves to the new screen on navigation. */
 export function Layout({ children }) {
   const location = useLocation();
   const mainRef = useRef(null);
   const first = useRef(true);
 
   useEffect(() => {
-    if (location.hash === '#how') {
-      const how = document.getElementById('how');
-      how?.scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
-      how?.querySelector('h2')?.focus({ preventScroll: true });
-      return;
+    if (location.hash) {
+      const el = document.getElementById(location.hash.slice(1));
+      if (el) {
+        el.scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+        (el.querySelector('h2') || el).focus?.({ preventScroll: true });
+        return;
+      }
     }
     window.scrollTo({ top: 0 });
     if (!first.current) mainRef.current?.focus({ preventScroll: true });
@@ -326,20 +370,20 @@ export function Layout({ children }) {
   }, [location.key, location.hash]);
 
   return (
-    <>
+    <div className="flex min-h-dvh flex-col">
       <a
         href="#main"
-        className="focus:bg-surface absolute -left-[9999px] focus:top-4 focus:left-4 focus:z-50 focus:px-3 focus:py-2"
+        className="bg-surface absolute -left-[9999px] z-50 px-4 py-3 font-semibold focus:top-3 focus:left-3"
       >
-        Skip to content
+        Skip to main content
       </a>
       <Header />
-      <BuildNotes />
-      <main id="main" tabIndex={-1} ref={mainRef} key={location.key} className="focus:outline-none">
+      <PrototypeBanner />
+      <main id="main" tabIndex={-1} ref={mainRef} key={location.key} className="flex-1 focus:outline-none">
         {children}
       </main>
       <Footer />
       <Toast />
-    </>
+    </div>
   );
 }

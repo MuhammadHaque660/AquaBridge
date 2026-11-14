@@ -7,7 +7,7 @@ import { matchPath } from 'react-router';
 export const ROUTES = {
   home: {
     path: '/',
-    title: 'Homepage',
+    title: 'Home',
     owner: 'Shared · Farhan coordinates routes',
     tasks: 'Route map',
     stories: 'CORE-003',
@@ -37,29 +37,29 @@ export const ROUTES = {
   },
   rehome: {
     path: '/rehome',
-    title: 'Guided questionnaire',
+    title: 'Rehoming questions',
     owner: 'Farhan',
     tasks: 'F-01, F-02, F-05',
     stories: 'GUID-001, GUID-002, SPEC-001',
   },
-  review: { path: '/rehome/review', title: 'Review answers', owner: 'Farhan', tasks: 'F-03', stories: 'GUID-003' },
+  review: { path: '/rehome/review', title: 'Check your answers', owner: 'Farhan', tasks: 'F-03', stories: 'GUID-003' },
   guidance: {
     path: '/rehome/guidance',
-    title: 'Guidance outcome',
+    title: 'Your rehoming guidance',
     owner: 'Farhan',
     tasks: 'F-04, F-06',
     stories: 'GUID-004, GUID-005, GUID-006',
   },
   signin: {
     path: '/signin',
-    title: 'Sign in checkpoint',
+    title: 'Sign in',
     owner: 'Shared · Farhan coordinates mock auth',
     tasks: 'Mock login + return path',
     stories: 'REG-001, REG-002, REG-005',
   },
   mylistings: {
     path: '/account/listings',
-    title: 'My Listings',
+    title: 'My listings',
     owner: 'Shawn',
     tasks: 'S-04, S-05',
     stories: 'LIST-003, LIST-007',
@@ -67,7 +67,7 @@ export const ROUTES = {
   },
   incoming: {
     path: '/account/incoming',
-    title: 'Incoming requests',
+    title: 'Requests for my listings',
     owner: 'Shawn + Midhir (habitat summary)',
     tasks: 'S-06, S-07, M-05',
     stories: 'REQ-002, REQ-003, REQ-005, REQ-006, HAB-006',
@@ -76,7 +76,7 @@ export const ROUTES = {
   habitat: {
     path: '/account/habitat',
     alt: ['/account/habitat/:edit'],
-    title: 'My Habitat',
+    title: 'My tanks and ponds',
     owner: 'Midhir',
     tasks: 'M-01, M-02',
     stories: 'HAB-001, HAB-002',
@@ -92,7 +92,7 @@ export const ROUTES = {
   },
   request: {
     path: '/request/:id/:hab',
-    title: 'Request adoption',
+    title: 'Request to adopt',
     owner: 'Midhir (screen) → Shawn (service)',
     tasks: 'M-06, S-08',
     stories: 'REQ-001',
@@ -100,12 +100,36 @@ export const ROUTES = {
   },
   myrequests: {
     path: '/account/requests',
-    title: 'My Requests',
+    title: 'My adoption requests',
     owner: 'Midhir',
     tasks: 'M-07',
     stories: 'REQ-004, REQ-005, REQ-006, REQ-008',
     auth: true,
   },
+  sent: {
+    path: '/account/requests/sent/:id',
+    title: 'Request sent',
+    owner: 'Midhir',
+    tasks: 'M-06',
+    stories: 'REQ-001',
+    auth: true,
+  },
+  help: {
+    path: '/how-it-works',
+    title: 'How it works',
+    owner: 'Shared · Farhan coordinates routes',
+    tasks: 'Route map',
+    stories: 'CORE-003, GUID-006',
+  },
+  privacy: { path: '/privacy', title: 'Privacy', owner: 'Shared', tasks: 'Footer pages', stories: 'CORE-001' },
+  accessibility: {
+    path: '/accessibility',
+    title: 'Accessibility',
+    owner: 'Shared',
+    tasks: 'SH-08',
+    stories: 'CORE-002',
+  },
+  contact: { path: '/contact', title: 'Contact', owner: 'Shared', tasks: 'Footer pages', stories: 'CORE-003' },
   demos: {
     path: '/demos',
     title: 'Demo flows',
@@ -144,6 +168,8 @@ export function to(name, p = {}) {
       return `/check/${p.id}${p.hab ? `?hab=${p.hab}` : ''}`;
     case 'request':
       return `/request/${p.id}/${p.hab}`;
+    case 'sent':
+      return `/account/requests/sent/${p.id}`;
     case 'signin':
       return `/signin${p.tab ? `?tab=${p.tab}` : ''}`;
     default:
